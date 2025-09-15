@@ -1,0 +1,380 @@
+.a4 {
+    width: 21cm;
+    max-width: 95%;
+    min-height: 29.7cm;
+    padding: 0.6cm;
+    background: white;
+    box-sizing: border-box;
+    margin: 10px auto;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    transform-origin: top center;
+}
+
+@media (max-width: 1600px) {
+    .a4 {
+        width: 18cm;
+        max-width: 90%;
+    }
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #f6f7f8;
+    color: #000000;
+    display: box;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.6;
+}
+
+h1 {
+    font-size: 38px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 0px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+p {
+    margin: 6px 0 12px 0;
+    line-height: 1.6;
+    font-size: 16px;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.card {
+    background: {theme_color}1a;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid #dfe6ea;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin: 10px 0 20px 0;
+    border: 1.5px solid #000000;
+    border-radius: 8px;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+thead tr {
+    background: {theme_color};
+    color: #fff;
+    line-height: 1.4;
+}
+
+thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 700;
+    border-right: 1.5px solid #000000;
+}
+
+thead th:last-child {
+    border-right: none;
+}
+
+tbody td {
+    padding: 10px 12px;
+    border-top: 1.5px solid rgb(0, 0, 0);
+    border-right: 1.5px solid #000;
+}
+
+tbody td:last-child {
+    border-right: none;
+}
+
+tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+    background: #f6f6f6;
+}
+
+tfoot td {
+    padding: 10px 12px;
+    border-top: 1.5px solid rgb(0, 0, 0);
+    font-weight: 600;
+    background: {theme_color}13;
+}
+
+.diagram {
+    display: flex;
+    justify-content: center;
+    margin: 12px auto;
+    padding: 10px 12px;
+    overflow: visible;
+    height: 100px;
+}
+
+.small {
+    max-width: 420px;
+}
+
+ul {
+    margin: 6px 0 12px 18px;
+}
+
+code {
+    background: #eef2f4;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.note {
+    font-size: 13px;
+    color: #444;
+    margin-top: 8px;
+}
+
+.fact {
+    border-left: 6px solid {theme_color};
+    padding: 12px 16px;
+    margin: 10px 0;
+}
+
+.fact strong,
+.fact::first-line {
+    font-weight: bold;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 12px 0 18px;
+}
+
+.stat {
+    text-align: center;
+    padding: 12px 10px;
+    border: 1.5px solid #000;
+    border-radius: 10px;
+    background: {theme_color}27;
+}
+
+.stat .big {
+    font-size: 28px;
+    color: {theme_color};
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.stat .sub {
+    font-size: 14px;
+    color: {theme_color};
+    line-height: 1.3;
+    margin: 10px 0;
+}
+
+.figure {
+    float: right;
+    width: 180px;
+    margin: 0 0 12px 16px;
+}
+
+.figure > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.figure .caption {
+    display: block;
+    max-width: 100%;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.35;
+    color: {theme_color};
+}
+
+.timeline {
+    position: relative;
+    margin: 20px 0 20px 60px;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 50px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: {theme_color};
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding-left: 70px;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 44px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: {theme_color};
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px {theme_color};
+}
+
+.timeline-date {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    font-weight: 600;
+    color: {theme_color};
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    line-height: 1.2;
+    font-family: Helvetica, Arial, sans-serif;
+    width: 40px;
+}
+
+.timeline-content {
+    background: #fff;
+    border: 1px solid {theme_color}40;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.timeline-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: {theme_color};
+    margin: 0 0 6px 0;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.timeline-description {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.citations {
+    margin: 20px 0;
+    padding: 16px;
+    background: {theme_color}0d;
+    border-left: 4px solid {theme_color};
+    border-radius: 0 8px 8px 0;
+}
+
+.citations h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: {theme_color};
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.citation {
+    display: flex;
+    align-items: flex-start;
+    margin: 8px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid {theme_color}20;
+}
+
+.citation:last-child {
+    border-bottom: none;
+}
+
+.citation-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: {theme_color};
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 12px;
+    margin-top: 2px;
+}
+
+.citation-content {
+    flex-grow: 1;
+}
+
+.citation-title {
+    font-weight: 600;
+    color: {theme_color};
+    font-size: 14px;
+    line-height: 1.3;
+    margin: 0 0 4px 0;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.citation-title:hover {
+    color: {theme_color};
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+.citation-snippet {
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+    font-style: italic;
+}
+
+@media print {
+    body {
+        background: none;
+        margin: 0;
+    }
+    .a4 {
+        width: auto;
+        min-height: auto;
+        padding: 0;
+        box-shadow: none;
+        page-break-after: always;
+    }
+    table {
+        font-size: 13px;
+    }
+    h2 {
+        font-size: 18px;
+    }
+}

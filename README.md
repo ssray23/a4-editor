@@ -1,70 +1,211 @@
-# Getting Started with Create React App
+# A4 Editor
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, web-based WYSIWYG document editor that creates professional A4-formatted documents with beautiful styling. Built with React and designed for creating visually appealing documents with tables, statistics, timelines, and more.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+### Document Elements
+- **Headings** (H1, H2, H3) with customizable theme colors
+- **Paragraphs** with natural text wrapping
+- **Tables** with advanced editing capabilities
+- **Stat Grids** for displaying metrics and key numbers
+- **Fact Boxes** for highlighting important information
+- **Timelines** for chronological content
+- **Citations** for references and sources
 
-### `npm start`
+### Advanced Table Editor
+- **3x3 default tables** with professional styling
+- **WYSIWYG editing** - what you see is what you get
+- **Visual styling** with theme colors, borders, and alternating rows
+- **Bold formatting** per cell (Ctrl+B or button)
+- **Natural text wrapping** in cells
+- **Column resizing** with drag handles
+- **Add/delete rows and columns** with intuitive controls
+- **Header editing** with click-to-edit functionality
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Customization
+- **Theme color picker** - customize the accent color throughout
+- **Header color toggle** - switch between black and theme-colored headings
+- **Drag & drop reordering** of document elements
+- **Real-time preview** - see exactly how it will look when printed
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Export & Persistence
+- **HTML export** with embedded CSS for sharing
+- **Local storage** - automatically saves your work
+- **A4 formatting** - optimized for printing and professional documents
 
-### `npm test`
+## 🛠️ Technical Architecture
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Built With
+- **React 19** - Modern React with latest features
+- **@hello-pangea/dnd** - Drag and drop functionality
+- **react-color** - Color picker component
+- **CSS-in-JS** - Dynamic styling with theme support
 
-### `npm run build`
+### Key Components
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### A4Editor (Main Component)
+- Manages document state and theme
+- Handles block creation, updates, and deletion
+- Provides toolbar with content type buttons
+- Manages color picker and theme switching
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### BlockEditor (Content Component)
+- Renders different content types based on block type
+- Handles editing states and user interactions
+- Manages table-specific functionality (bold cells, resizing, etc.)
+- Provides WYSIWYG editing experience
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Table System
+- **Visual styling** - matches final output during editing
+- **ContentEditable divs** - allow natural text wrapping
+- **Bold cell tracking** - per-cell formatting state
+- **Column resizing** - drag handles with real-time updates
+- **Row management** - add/delete with visual feedback
 
-### `npm run eject`
+#### Styling System
+- **Dynamic CSS injection** - theme colors applied via JavaScript
+- **A4 CSS template** - professional document formatting
+- **Responsive design** - scales appropriately for different screens
+- **Print optimization** - clean output for PDF/print
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🎯 How It Works
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Document Structure
+Documents are stored as an array of blocks, where each block has:
+```javascript
+{
+  id: "unique-id",
+  type: "h1|h2|h3|p|table|stat-grid|fact|timeline|citation",
+  html: "content", // for text blocks
+  table: { // for table blocks
+    cols: ["Header 1", "Header 2", "Header 3"],
+    rows: [["Cell 1", "Cell 2", "Cell 3"]],
+    colWidths: {0: 150, 1: 200}, // column widths in pixels
+    boldCells: ["0-1", "1-2"] // bold cell coordinates
+  },
+  stats: [...], // for stat-grid blocks
+  events: [...] // for timeline blocks
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Theme System
+- **CSS Variable Injection** - theme colors inserted into CSS templates
+- **Dynamic Styling** - styles updated in real-time when theme changes
+- **Template Processing** - `{theme_color}` placeholders replaced with actual values
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Table Editing Flow
+1. **Click table** → enters editing mode with visual controls
+2. **Focus cell** → shows bold button and selection outline
+3. **Type content** → natural text wrapping with proper formatting
+4. **Use controls** → add/delete rows/columns, resize, format
+5. **Click away** → saves changes and returns to view mode
 
-## Learn More
+### Export Process
+1. **Generate CSS** - process theme colors into A4.css template
+2. **Render HTML** - convert blocks to semantic HTML
+3. **Combine** - create complete HTML document with embedded styles
+4. **Download** - trigger file download with proper formatting
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📋 Usage
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Getting Started
+1. **Add Content** - Use toolbar buttons to add different content types
+2. **Edit Content** - Click on any element to edit it inline
+3. **Customize Theme** - Use color picker to match your brand
+4. **Arrange Content** - Drag and drop to reorder elements
+5. **Export** - Click "Export HTML" to save your document
 
-### Code Splitting
+### Table Editing
+1. **Create Table** - Click table button (📊) to add 3x3 table
+2. **Edit Cells** - Click in any cell to start typing
+3. **Format Text** - Select cell and click **B** or press **Ctrl+B** for bold
+4. **Manage Structure**:
+   - **Add Row/Column** - Use ➕ buttons
+   - **Delete Row** - Click × button in row
+   - **Delete Column** - Click × button in header
+   - **Resize Column** - Drag the resize handle between headers
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Keyboard Shortcuts
+- **Ctrl+B** - Toggle bold formatting in table cells
+- **Enter** - Finish editing table headers
+- **Drag & Drop** - Reorder document elements
 
-### Analyzing the Bundle Size
+## 🎨 Styling Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Professional A4 Layout
+- **21cm × 29.7cm** dimensions with proper margins
+- **Helvetica font** throughout for consistency
+- **Professional spacing** and typography
+- **Print-ready** formatting
 
-### Making a Progressive Web App
+### Visual Table Design
+- **Theme-colored headers** with white text
+- **Alternating row colors** (#ffffff/#f6f6f6)
+- **1.5px borders** with rounded corners
+- **Proper cell padding** (10px/12px)
+- **Bold text support** per cell
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Responsive Design
+- **Scales down** on smaller screens
+- **Maintains proportions** across devices
+- **Touch-friendly** controls on mobile
 
-### Advanced Configuration
+## 💾 Data Persistence
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Local Storage
+- **Automatic saving** - changes saved immediately
+- **Version key** - `a4.blocks.v2` for data structure versioning
+- **Error handling** - graceful fallback if localStorage fails
 
-### Deployment
+### Export Format
+- **Standalone HTML** - complete document with embedded CSS
+- **No dependencies** - exported files work anywhere
+- **Professional styling** - maintains all formatting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🚀 Getting Started
 
-### `npm run build` fails to minify
+### Installation
+```bash
+npm install
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Build for Production
+```bash
+npm run build
+```
+
+## 📝 Current Status
+
+### ✅ Completed Features
+- Full document editor with multiple content types
+- Advanced table editor with visual styling
+- Theme customization with color picker
+- Drag & drop reordering
+- HTML export functionality
+- Local storage persistence
+- Professional A4 styling
+- Bold formatting in table cells
+- Column resizing and row/column management
+
+### 🔄 Known Issues
+- Text direction issue in contentEditable elements (affects table cells and stat grids)
+- Some browsers may display reversed text input in specific scenarios
+
+### 🎯 Future Enhancements
+- Fix text direction issues
+- Add more formatting options (italic, underline)
+- Support for images and media
+- Collaborative editing features
+- More export formats (PDF, Word)
+- Template library
+- Advanced table features (merge cells, borders)
+
+## 🤝 Contributing
+
+This project is actively developed and welcomes contributions. Feel free to submit issues and enhancement requests!
+
+## 📄 License
+
+MIT License - feel free to use this project for personal and commercial purposes.
