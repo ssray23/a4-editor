@@ -545,6 +545,23 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   // Use colWidths from block data or default
   const colWidths = useMemo(() => block.table?.colWidths || {}, [block.table?.colWidths]);
 
+  // Update cell content when block data changes, but only if not currently editing
+  useEffect(() => {
+    if (block.type === 'table' && selected && block.table?.rows) {
+      block.table.rows.forEach((row, ri) => {
+        row.forEach((cell, ci) => {
+          const cellElement = cellRefs.current[`${ri}-${ci}`];
+          if (cellElement && cellElement !== document.activeElement) {
+            // Only update if content is different and cell is not being edited
+            if (cellElement.innerHTML !== (cell || '')) {
+              cellElement.innerHTML = cell || '';
+            }
+          }
+        });
+      });
+    }
+  }, [block.table?.rows, selected, block.type]);
+
   useEffect(()=>{
     if(selected && ['fact','citation','card','p','h1','h2','h3'].includes(block.type) && ref.current){
       ref.current.innerHTML = block.html || '';
@@ -1010,44 +1027,58 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         dir="ltr"
                         // onInput={e=>updateHeader(hi,e.target.textContent)}
                         onInput={e => {
-                          // MIRRORING THE FIX FROM TABLE CELLS
+                          // Use the same cursor preservation logic as other contentEditable elements
                           const element = e.currentTarget;
-                          let text = element.textContent || '';
 
-                          // Force proper LTR direction on input
-                          element.setAttribute('dir', 'ltr');
-                          element.style.direction = 'ltr';
+                          // Save the current cursor position as a character offset
+                          const selection = window.getSelection();
+                          let caretOffset = 0;
+                          if (selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            const preCaretRange = range.cloneRange();
+                            preCaretRange.selectNodeContents(element);
+                            preCaretRange.setEnd(range.startContainer, range.startOffset);
+                            caretOffset = preCaretRange.toString().length;
+                          }
 
-                          // Update the header state
+                          const text = element.textContent || '';
                           updateHeader(hi, text);
 
-                          // CRITICAL: Restore cursor to the END of text after React re-renders
+                          // Restore the cursor position after React's re-render has completed
                           requestAnimationFrame(() => {
-                            element.setAttribute('dir', 'ltr');
-                            element.style.direction = 'ltr';
+                            if (!document.contains(element)) return; // Exit if element is no longer in the DOM
 
                             try {
                               const range = document.createRange();
                               const sel = window.getSelection();
 
-                              if (element.childNodes.length > 0) {
-                                const lastChild = element.childNodes[element.childNodes.length - 1];
-                                if (lastChild.nodeType === Node.TEXT_NODE) {
-                                  range.setStart(lastChild, Math.min(lastChild.textContent.length, lastChild.textContent.length));
-                                } else {
-                                  range.setStart(element, element.childNodes.length);
+                              // Use a TreeWalker to find the correct text node and offset
+                              const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+                              let charCount = 0;
+                              let found = false;
+
+                              while (walker.nextNode()) {
+                                const node = walker.currentNode;
+                                const nodeLength = node.textContent.length;
+                                if (charCount + nodeLength >= caretOffset) {
+                                  range.setStart(node, caretOffset - charCount);
+                                  range.collapse(true);
+                                  found = true;
+                                  break;
                                 }
-                              } else {
-                                range.setStart(element, 0);
+                                charCount += nodeLength;
                               }
 
-                              range.collapse(true);
+                              // If not found (e.g., empty element or at the very end), place cursor at the end
+                              if (!found) {
+                                range.selectNodeContents(element);
+                                range.collapse(false);
+                              }
+
                               sel.removeAllRanges();
                               sel.addRange(range);
-                            } catch (e) {
-                              console.warn('Could not restore cursor position in header:', e);
-                              // Fallback: just focus the element
-                              element.focus();
+                            } catch (err) {
+                              console.warn('Failed to restore cursor position in header:', err);
                             }
                           });
                         }}
@@ -1139,61 +1170,19 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                             el.style.textAlign = 'left';
                             el.style.unicodeBidi = 'normal';
                             el.setAttribute('dir', 'ltr');
+                            // Set initial content only if element is empty
+                            if (el.innerHTML !== (c || '')) {
+                              el.innerHTML = c || '';
+                            }
                           }
                         }}
                         contentEditable
                         suppressContentEditableWarning
                         dir="ltr"
                         onInput={e => {
-                          // ROOT CAUSE FIX: Cursor position issue in React contentEditable
-                          const element = e.target;
-
-                          // Save cursor position BEFORE getting content
-                          const selection = window.getSelection();
-                          const cursorPos = selection.anchorOffset;
-
-                          let html = element.innerHTML || '';
-                          let text = element.textContent || '';
-
-                          console.log('🔧 CURSOR FIX - HTML:', JSON.stringify(html), 'Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
-
-                          // Force proper cursor positioning
-                          element.setAttribute('dir', 'ltr');
-                          element.style.direction = 'ltr';
-
+                          const element = e.currentTarget;
+                          const html = element.innerHTML || '';
                           updateCell(ri,ci,html);
-
-                          // CRITICAL: Restore cursor to the END of text after React update
-                          requestAnimationFrame(() => {
-                            element.setAttribute('dir', 'ltr');
-                            element.style.direction = 'ltr';
-
-                            // Move cursor to end of text
-                            try {
-                              const range = document.createRange();
-                              const sel = window.getSelection();
-
-                              if (element.childNodes.length > 0) {
-                                const lastChild = element.childNodes[element.childNodes.length - 1];
-                                if (lastChild.nodeType === Node.TEXT_NODE) {
-                                  range.setStart(lastChild, lastChild.textContent.length);
-                                } else {
-                                  range.setStart(element, element.childNodes.length);
-                                }
-                              } else {
-                                range.setStart(element, 0);
-                              }
-                              range.collapse(true);
-                              sel.removeAllRanges();
-                              sel.addRange(range);
-                            } catch (e) {
-                              console.warn('Could not restore cursor position in table cell:', e);
-                              // Fallback: just focus the element
-                              element.focus();
-                            }
-
-                            console.log('🔧 Cursor restored to end of text');
-                          });
                         }}
                         onFocus={() => setSelectedCell({r: ri, c: ci})}
                         onBlur={(e) => {
@@ -1226,7 +1215,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           textAlign: 'left',
                           unicodeBidi: 'normal'
                         }}
-                        dangerouslySetInnerHTML={{ __html: c || '' }}
                       ></div>
                     </td>
                   ))}
