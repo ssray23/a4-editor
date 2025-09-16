@@ -6,7 +6,7 @@ function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'
 
 // Simple fix based on Stack Overflow research - just force dir attribute
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
@@ -300,6 +300,22 @@ ${body}
           return;
         }
 
+        // Extract theme color from CSS
+        const styleElement = doc.querySelector('style');
+        if (styleElement) {
+          const cssText = styleElement.textContent;
+          // Look for color patterns in h1, table backgrounds, etc.
+          const colorMatch = cssText.match(/color:#([a-fA-F0-9]{6})/);
+          if (colorMatch) {
+            const extractedColor = '#' + colorMatch[1];
+            setTheme(extractedColor);
+
+            // Also check if theme colors are used for headings
+            const themeColorUsed = cssText.includes(`color:${extractedColor}`);
+            setUseThemeColor(themeColorUsed);
+          }
+        }
+
         const newBlocks = [];
         const children = a4Div.children;
 
@@ -308,11 +324,11 @@ ${body}
           const id = genId();
 
           if (el.tagName === 'H1') {
-            newBlocks.push({ id, type: 'h1', html: el.textContent || el.innerText });
+            newBlocks.push({ id, type: 'h1', html: el.innerHTML });
           } else if (el.tagName === 'H2') {
-            newBlocks.push({ id, type: 'h2', html: el.textContent || el.innerText });
+            newBlocks.push({ id, type: 'h2', html: el.innerHTML });
           } else if (el.tagName === 'H3') {
-            newBlocks.push({ id, type: 'h3', html: el.textContent || el.innerText });
+            newBlocks.push({ id, type: 'h3', html: el.innerHTML });
           } else if (el.tagName === 'P') {
             newBlocks.push({ id, type: 'p', html: el.innerHTML });
           } else if (el.classList.contains('fact')) {
@@ -344,7 +360,19 @@ ${body}
           } else if (el.tagName === 'TABLE') {
             const headers = Array.from(el.querySelectorAll('thead th')).map(th => th.textContent || '');
             const rows = Array.from(el.querySelectorAll('tbody tr')).map(tr =>
-              Array.from(tr.querySelectorAll('td')).map(td => td.textContent || '')
+              Array.from(tr.querySelectorAll('td')).map(td => {
+                // Check if cell has CSS bold styling and convert to HTML
+                const cellStyle = td.getAttribute('style') || '';
+                const hasCssBold = cellStyle.includes('font-weight:bold') || cellStyle.includes('font-weight: bold');
+                let cellContent = td.innerHTML || '';
+
+                // If cell has CSS bold but no HTML bold tags, wrap content in <b>
+                if (hasCssBold && !cellContent.includes('<b>') && !cellContent.includes('<strong>') && cellContent.trim()) {
+                  cellContent = `<b>${cellContent}</b>`;
+                }
+
+                return cellContent;
+              })
             );
             newBlocks.push({
               id,
@@ -514,7 +542,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   const colWidths = useMemo(() => block.table?.colWidths || {}, [block.table?.colWidths]);
 
   useEffect(()=>{
-    if(selected && ['fact','citation','card','p'].includes(block.type) && ref.current){
+    if(selected && ['fact','citation','card','p','h1','h2','h3'].includes(block.type) && ref.current){
       ref.current.innerHTML = block.html || '';
       // Force LTR direction with JavaScript
       ref.current.style.direction = 'ltr';
@@ -735,9 +763,9 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
         <button onClick={e=>{e.stopPropagation(); onRemove();}} title="Delete Block" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
       </div>
 
-      {block.type==='h1' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
-      {block.type==='h2' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
-      {block.type==='h3' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
+      {block.type==='h1' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'38px'}} dir="ltr"></div>}
+      {block.type==='h2' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'24px'}} dir="ltr"></div>}
+      {block.type==='h3' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px'}} dir="ltr"></div>}
       {block.type==='p' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px', whiteSpace:'pre-wrap'}} dir="ltr"></div>}
       {block.type==='fact' && <div className={selected ? "fact fact-editing" : "fact"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
       {block.type==='card' && <div className="card" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
