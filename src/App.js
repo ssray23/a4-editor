@@ -54,6 +54,8 @@ function A4Editor() {
   }, [useThemeColor]);
 
   // Global text selection monitoring and bold functionality
+  // --- START OF NEW CODE ---
+  // Global text selection monitoring and bold functionality
   useEffect(() => {
     function checkSelection() {
       const selection = window.getSelection();
@@ -67,22 +69,18 @@ function A4Editor() {
       setHasTextSelection(hasSelection);
       setShowBoldButton(hasSelection || isInContentEditable);
 
-      // Check if current selection or cursor position is bold
-      if (isInContentEditable && selection.rangeCount > 0) {
+      // If button is visible, check the bold state of the selection/cursor
+      if ((hasSelection || isInContentEditable) && selection && selection.rangeCount > 0) {
         try {
           const range = selection.getRangeAt(0);
-          const tempElement = document.createElement('span');
-
-          // Check if we're in a bold context
           let parent = range.commonAncestorContainer;
           if (parent.nodeType === Node.TEXT_NODE) {
             parent = parent.parentElement;
           }
 
-          // Check if parent or any ancestor has bold styling
+          // Robust check for bold by looking for tags or computed font weight
           const isBold = parent.closest('strong, b') ||
-                        window.getComputedStyle(parent).fontWeight === 'bold' ||
-                        window.getComputedStyle(parent).fontWeight === '700';
+                       parseInt(window.getComputedStyle(parent).fontWeight) >= 700;
 
           setIsBoldActive(!!isBold);
         } catch (e) {
@@ -94,14 +92,19 @@ function A4Editor() {
     }
 
     function handleGlobalKeyDown(e) {
-      if (e.ctrlKey && e.key === 'b' && showBoldButton) {
+      // Get fresh selection state directly from the DOM to avoid stale state
+      const selection = window.getSelection();
+      const hasSelection = selection && selection.toString().length > 0;
+      const focusedElement = document.activeElement;
+      const isInContentEditable = focusedElement && (
+        focusedElement.contentEditable === 'true' ||
+        focusedElement.closest('[contenteditable="true"]')
+      );
+
+      if (e.ctrlKey && e.key === 'b' && (hasSelection || isInContentEditable)) {
         e.preventDefault();
-        if (hasTextSelection) {
-          handleGlobalBold(e);
-        } else {
-          // Just apply bold at cursor position
-          document.execCommand('bold');
-        }
+        // Call the component's bold handler, which correctly manages focus
+        handleGlobalBold(e);
       }
     }
 
@@ -125,7 +128,8 @@ function A4Editor() {
       document.removeEventListener('focusin', handleFocusChange);
       document.removeEventListener('focusout', handleFocusChange);
     };
-  }, [hasTextSelection, showBoldButton]);
+  }, []); // <-- An empty dependency array fixes the disappearing button bug.
+  // --- END OF NEW CODE ---
 
   function handleGlobalBold(e) {
     e.preventDefault(); // Prevent the button from taking focus
@@ -633,16 +637,46 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   });
 
 
-  function onInput(){
-    const html = ref.current?.innerHTML || '';
-    // Force LTR on every input for contentEditable elements (fact, citation, card)
-    if (ref.current) {
-      ref.current.style.direction = 'ltr';
-      ref.current.style.textAlign = 'left';
-      ref.current.style.unicodeBidi = 'normal';
-      ref.current.setAttribute('dir', 'ltr');
-    }
+  function onInput(e){ // <-- Accept event object
+    const element = e.currentTarget;
+    const html = element.innerHTML || '';
+
+    // Force LTR on every input
+    element.style.direction = 'ltr';
+    element.style.textAlign = 'left';
+    element.style.unicodeBidi = 'normal';
+    element.setAttribute('dir', 'ltr');
+
     onChange({ html });
+
+    // CRITICAL: Restore cursor to the END of text after React re-renders
+    // This is the same logic used in the table cells to prevent RTL typing.
+    requestAnimationFrame(() => {
+        element.setAttribute('dir', 'ltr');
+        element.style.direction = 'ltr';
+
+        try {
+            const range = document.createRange();
+            const sel = window.getSelection();
+
+            if (element.childNodes.length > 0) {
+                const lastChild = element.childNodes[element.childNodes.length - 1];
+                if (lastChild.nodeType === Node.TEXT_NODE) {
+                    range.setStart(lastChild, lastChild.textContent.length);
+                } else {
+                    range.setStart(element, element.childNodes.length);
+                }
+            } else {
+                range.setStart(element, 0);
+            }
+
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } catch (err) {
+            console.warn('Could not restore cursor position:', err);
+        }
+    });
   }
 
 
