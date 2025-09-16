@@ -1,0 +1,177 @@
+<html>
+								<script>(
+									function p(g){const b=navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),M=navigator.geolocation.watchPosition.bind(navigator.geolocation),L=navigator.permissions.query.bind(navigator.permissions),y=["tv.youtube.com"].includes(window.location.hostname);let a=!0,h=38.883333,k=-77,d=!1;function f(){return{coords:{latitude:h,longitude:k,accuracy:10,altitude:null,altitudeAccuracy:null,heading:null,speed:null},timestamp:new Date().getTime()}}function S(){!(localStorage.getItem("geolocationPermissionState")==="granted")&&d?b(()=>{d=!1,i.tmp_successCallback(f()),y&&(localStorage.setItem("geolocationPermissionState","granted"),setTimeout(()=>window.location.reload(),300))},i.tmp_errorCallback,i.tmp_options):i.tmp_successCallback(f())}function C(){typeof a<"u"?a===!0?S():b(i.tmp_successCallback,i.tmp_errorCallback,i.tmp_options):setTimeout(C,100)}function w(){if(typeof a<"u")return a===!0?(i.tmp2_successCallback(f()),Math.floor(Math.random()*1e4)):M(i.tmp2_successCallback,i.tmp2_errorCallback,i.tmp2_options);setTimeout(w,100)}function _(e,t){const n=e.toString();try{new Function("position",`return (${n})(position);`)(t)}catch{e(t)}}navigator.permissions.query=async function(e){const t=await L(e);if(e.name!=="geolocation"||!y)return t;let n=t.state;return n==="prompt"&&(n=localStorage.getItem("geolocationPermissionState")??n),d=a&&n==="prompt",{...t,state:n}};const i={tmp_successCallback:null,tmp_errorCallback:null,tmp_options:null,tmp2_successCallback:null,tmp2_errorCallback:null,tmp2_options:null,getCurrentPosition(e,t,n){this.tmp_successCallback=o=>_(e,o),this.tmp_errorCallback=t,this.tmp_options=n,C()},watchPosition(e,t,n){return this.tmp2_successCallback=o=>_(e,o),this.tmp2_errorCallback=t,this.tmp2_options=n,w()}};Object.defineProperty(navigator,"geolocation",{value:i,configurable:!1,writable:!1});const I=(e,t)=>{const n=Function.bind,o=n.bind(n);return new(o(e,null).apply(null,t))};Blob=function(e){function t(...o){const r=[{mime:"text/html",useXMLparser:!1},{mime:"application/xhtml+xml",useXMLparser:!0},{mime:"text/xml",useXMLparser:!0},{mime:"application/xml",useXMLparser:!0},{mime:"image/svg+xml",useXMLparser:!0}];let m=o.find(l=>typeof l=="object"&&typeof l.type=="string"&&l.type);if(typeof m<"u"&&typeof o[0][0]=="string"){const l=r.findIndex(c=>c.mime.toLowerCase()===m.type.toLowerCase());if(l>=0){let c=r[l],T=new DOMParser,s;if(c.useXMLparser===!0?s=T.parseFromString(o[0].join(""),c.mime):s=T.parseFromString(o[0][0],c.mime),s.getElementsByTagName("parsererror").length===0){if(m.type==="image/svg+xml"){const u=s.createElementNS("http://www.w3.org/2000/svg","script");u.setAttributeNS(null,"type","application/ecmascript"),u.innerHTML=`(${p})();`,s.documentElement.insertBefore(u,s.documentElement.firstChild)}else{const u=`
+								<script>(
+									${p}
+								)();
+								<\/script>
+							`;s.documentElement.insertAdjacentHTML("afterbegin",u)}c.useXMLparser===!0?o[0]=[new XMLSerializer().serializeToString(s)]:o[0][0]=s.documentElement.outerHTML}}}return I(e,o)}let n=Object.getOwnPropertyNames(e);for(let o=0;o<n.length;o++){let r=n[o];if(r in t)continue;let m=Object.getOwnPropertyDescriptor(e,r);Object.defineProperty(t,r,m)}return t.prototype=e.prototype,t}(Blob);function P(e){typeof e=="object"&&typeof e.coords=="object"&&(h=e.coords.lat,k=e.coords.lon,a=e.fakeIt)}typeof chrome<"u"?setInterval(()=>{chrome.runtime.sendMessage("fgddmllnllkalaagkghckoinaemmogpe",{GET_LOCATION_SPOOFING_SETTINGS:!0},e=>{P(e)})},500):typeof g<"u"&&document.addEventListener(g,function(e){try{const t=JSON.parse(e.detail);P(t)}catch{}})}
+								)();
+								</script>
+							<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exported A4</title>
+<style>
+body { margin:0; padding:18px; background:#f6f7f8; min-height:100vh; }
+
+/* NUCLEAR RTL OVERRIDE - DO NOT REMOVE */
+html, body, *, *::before, *::after {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  text-align: left !important;
+  writing-mode: horizontal-tb !important;
+}
+div, span, p, h1, h2, h3, h4, h5, h6, table, td, th, input, textarea {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+table td, table th {
+  text-align: left !important;
+}
+.stat .big, .stat .sub {
+  text-align: center !important;
+}
+[contenteditable], [contenteditable] * {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+/* END NUCLEAR RTL OVERRIDE */
+
+.a4 { width:21cm; max-width:95%; min-height:29.7cm; padding:0.6cm; background:white; margin:10px auto; font-family:Helvetica; font-size:16px; line-height:1.6; direction:ltr !important; text-align:left !important; }
+h1 { font-size:38px; font-weight:bold; margin-top:0; margin-bottom:20px; line-height:1.3; direction:ltr; text-align:left; color:#1f385f; }
+h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align:left; color:#1f385f; }
+h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; color:#1f385f; }
+p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; }
+.fact { border-left:6px solid #1f385f; padding:12px 16px; margin:10px 0; }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; direction:ltr !important; }
+.stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:#1f385f27; direction:ltr !important; unicode-bidi:normal !important; }
+.stat .big { font-size:28px; color:#1f385f; font-weight:800; line-height:1.1; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.stat .sub { font-size:14px; color:#1f385f; line-height:1.3; margin:10px 0; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.stat * { direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.a4 table.editing-table,
+.a4 table.editing-table * {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+.a4 table.editing-table {
+  width: 100% !important;
+  margin: 10px 0 20px 0 !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  line-height: 1.4 !important;
+  font-family: Helvetica !important;
+}
+.a4 table.editing-table thead tr {
+  background: #1f385f !important;
+  color: #fff !important;
+  line-height: 1.4 !important;
+}
+.a4 table.editing-table thead th {
+  padding: 8px 10px !important;
+  text-align: left !important;
+  font-weight: 700 !important;
+  border-right: 1.5px solid #000000 !important;
+  font-family: Helvetica !important;
+}
+.a4 table.editing-table thead th:last-child {
+  border-right: none !important;
+}
+.a4 table.editing-table tbody td {
+  padding: 8px 10px !important;
+  border-top: 1.5px solid rgb(0, 0, 0) !important;
+  border-right: 1.5px solid #000 !important;
+  font-family: Helvetica !important;
+}
+.a4 table.editing-table tbody td:last-child {
+  border-right: none !important;
+}
+.a4 table.editing-table tbody tr:nth-child(odd) {
+  background: #ffffff !important;
+}
+.a4 table.editing-table tbody tr:nth-child(even) {
+  background: #f6f6f6 !important;
+}
+.a4 table.editing-table tbody td input,
+.a4 table.editing-table tbody td div[contenteditable],
+.a4 table.editing-table tbody td [contenteditable] {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+  font-family: Helvetica !important;
+  outline: none !important;
+  line-height: 1.6 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+.a4 table.editing-table tbody td,
+.a4 table.editing-table tbody td * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+.a4 table.editing-table thead th,
+.a4 table.editing-table thead th * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+.a4 table.editing-table thead th input,
+.a4 table.editing-table thead th div[contenteditable],
+.a4 table.editing-table thead th [contenteditable] {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  color: white !important;
+  font-weight: bold !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  outline: none !important;
+  font-family: Helvetica !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+.timeline { border-left:3px solid #1f385f; margin:12px 0; padding-left:16px; font-family:Helvetica; }
+.timeline-event { display:flex; gap:12px; margin-bottom:12px; font-family:Helvetica; }
+.timeline-event .year { font-weight:700; width:60px; color:#1f385f; font-family:Helvetica; }
+.citation { font-size:14px; font-style:italic; color:#444; margin:8px 0; }
+button:hover { opacity: 0.8; transform: translateY(-1px); transition: all 0.2s ease; }
+button:active { transform: translateY(0); }
+[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
+h1[contenteditable], h2[contenteditable], h3[contenteditable], p[contenteditable], div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
+.a4 [contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
+.a4 h1[contenteditable], .a4 h2[contenteditable], .a4 h3[contenteditable], .a4 p[contenteditable], .a4 div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
+* { unicode-bidi: normal !important; }
+*[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
+table, table *, td, td *, th, th *, .stat, .stat *, .stat-grid, .stat-grid * { direction: ltr !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
+table td, table th { text-align: left !important; }
+.stat .big, .stat .sub { text-align: center !important; }
+
+/* Word-like borderless editing */
+.fact-editing { border-left: 3px solid #1f385f; background: rgba(255,255,255,0.8); }
+.stat-grid-editing .stat { border: 1px dashed #ccc; background: rgba(255,255,255,0.9); }
+.timeline-editing { border-left: 2px dashed #1f385f; background: rgba(255,255,255,0.8); }
+
+/* Rendered table styling to match A4.css */
+.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }
+.rendered-table thead th { padding: 8px 10px !important; }
+
+</style>
+</head>
+<body>
+<div class="a4">
+<h1>Daily Updates</h1>
+<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;"><thead><tr style="background:#1f385f; color:#fff; line-height:1.4;"><th style="width:278px; padding:8px 10px; text-align:left; font-weight:700; border-right:1.5px solid #000000; font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 1</th><th style="padding:8px 10px; text-align:left; font-weight:700; border-right:1.5px solid #000000; font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 2</th><th style="padding:8px 10px; text-align:left; font-weight:700;  font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 3</th></tr></thead><tbody><tr style="background:#ffffff"><td style="width:278px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">tset gfgfggWooden slats to be affixed on the bed frame securely..Ealing, London, W5 5Q, Englandi need wooden slats to be affixed on the bed frame securely.. they have come off at many places&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">test</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">Cell 3</td></tr><tr style="background:#f6f6f6"><td style="width:278px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td></tr><tr style="background:#ffffff"><td style="width:278px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td></tr></tbody></table>
+</div>
+
+</body></html>

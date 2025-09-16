@@ -6,7 +6,7 @@ function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'
 
 // Simple fix based on Stack Overflow research - just force dir attribute
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${escapeHtml(b.html||" ")}</p>`; if (b.type === "fact") return `<div class="fact">${escapeHtml(b.html||" ")}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:10px 12px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica,Arial,sans-serif; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:10px 12px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica,Arial,sans-serif; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica,Arial,sans-serif;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${escapeHtml(b.html||" ")}</div>`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${escapeHtml(b.html||" ")}</p>`; if (b.type === "fact") return `<div class="fact">${escapeHtml(b.html||" ")}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${escapeHtml(c) || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${escapeHtml(b.html||" ")}</div>`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
@@ -30,54 +30,6 @@ function A4Editor() {
     localStorage.setItem("a4.blocks.v2", JSON.stringify(blocks));
   }, [blocks]);
 
-  // NUCLEAR OPTION: Global mutation observer to force LTR on everything
-  useEffect(() => {
-    function forceLTR(element) {
-      if (element.nodeType === 1) { // Element node
-        element.style.setProperty('direction', 'ltr', 'important');
-        element.style.setProperty('unicode-bidi', 'normal', 'important');
-        element.setAttribute('dir', 'ltr');
-
-        // Special handling for specific elements
-        if (element.tagName === 'TD' || element.tagName === 'TH') {
-          element.style.setProperty('text-align', 'left', 'important');
-        }
-        if (element.classList.contains('big') || element.classList.contains('sub')) {
-          element.style.setProperty('text-align', 'center', 'important');
-        }
-      }
-    }
-
-    function forceLTROnSubtree(element) {
-      forceLTR(element);
-      for (let child of element.children) {
-        forceLTROnSubtree(child);
-      }
-    }
-
-    // Initial force on entire document
-    forceLTROnSubtree(document.documentElement);
-
-    // Set up mutation observer
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === 1) {
-            forceLTROnSubtree(node);
-          }
-        });
-      });
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['dir', 'style']
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const existingStyle = document.getElementById("a4-style");
@@ -197,25 +149,25 @@ ${body}
           <h3 style={{margin:0}}>A4 Editor</h3>
           <div style={{display:'flex', gap:8, alignItems:'center'}}>
             <label style={{fontSize:13}}>Theme</label>
-            <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>🎨</button>
-            <button onClick={() => setUseThemeColor(s => !s)} title={useThemeColor ? "Use Black Headings" : "Use Theme Color Headings"} style={{width:'40px', height:'40px', border:'2px solid ' + (useThemeColor ? theme : '#ddd'), borderRadius:'50%', background: useThemeColor ? theme : 'white', color: useThemeColor ? 'white' : 'black', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold'}}>H</button>
+            <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎨</button>
+            <button onClick={() => setUseThemeColor(s => !s)} title={useThemeColor ? "Use Black Headings" : "Use Theme Color Headings"} style={{width:'40px', height:'40px', border:'2px solid ' + (useThemeColor ? theme : '#333'), borderRadius:'50%', background: useThemeColor ? theme : 'white', color: useThemeColor ? 'white' : 'black', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>H</button>
             {showColorPicker && (
-              <div style={{ position: 'absolute', zIndex: 2 }}>
+              <div style={{ position: 'absolute', zIndex: 1000, top: '50px', left: '-10px' }}>
                 <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, left: 0 }} onClick={() => setShowColorPicker(false)} />
                 <SketchPicker color={theme} onChangeComplete={color => setTheme(color.hex)} />
               </div>
             )}
-            <button onClick={()=>addBlock('h1')} title="Add H1" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>📝</button>
-            <button onClick={()=>addBlock('h2')} title="Add H2" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center'}}>📄</button>
-            <button onClick={()=>addBlock('h3')} title="Add H3" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'12px', display:'flex', alignItems:'center', justifyContent:'center'}}>📃</button>
-            <button onClick={()=>addBlock('p')} title="Add Paragraph" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>📄</button>
-            <button onClick={()=>addBlock('table')} title="Add Table" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>📊</button>
-            <button onClick={()=>addBlock('stat-grid')} title="Add Stat Grid" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>📈</button>
-            <button onClick={()=>addBlock('fact')} title="Add Fact Box" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>💡</button>
-            <button onClick={()=>addBlock('timeline')} title="Add Timeline" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>⏰</button>
-            <button onClick={()=>addBlock('citation')} title="Add Citation" style={{width:'40px', height:'40px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>📚</button>
-            <button onClick={clearAll} title="Clear All Content" style={{width:'40px', height:'40px', border:'1px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center'}}>🗑️</button>
-            <button onClick={exportHtml}>Export HTML</button>
+            <button onClick={()=>addBlock('h1')} title="Add H1" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📝</button>
+            <button onClick={()=>addBlock('h2')} title="Add H2" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📄</button>
+            <button onClick={()=>addBlock('h3')} title="Add H3" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'12px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📃</button>
+            <button onClick={()=>addBlock('p')} title="Add Paragraph" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📄</button>
+            <button onClick={()=>addBlock('table')} title="Add Table" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📊</button>
+            <button onClick={()=>addBlock('stat-grid')} title="Add Stat Grid" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📈</button>
+            <button onClick={()=>addBlock('fact')} title="Add Fact Box" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>💡</button>
+            <button onClick={()=>addBlock('timeline')} title="Add Timeline" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>⏰</button>
+            <button onClick={()=>addBlock('citation')} title="Add Citation" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📚</button>
+            <button onClick={clearAll} title="Clear All Content" style={{width:'40px', height:'40px', border:'2px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
+            <button onClick={exportHtml} style={{background:'white', color:'#333', border:'2px solid #666', borderRadius:'25px', padding:'12px 24px', cursor:'pointer', fontSize:'14px', fontWeight:'600', fontFamily:'Helvetica', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>📤 Export HTML</button>
           </div>
         </div>
       </div>
@@ -393,7 +345,12 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
   // Table helpers
   function addRow(){ const rows = [...(block.table.rows||[])]; const cols = block.table.cols||[]; rows.push(cols.map(()=>"")); onChange({ table: {...block.table, rows }});}
-  function addCol(){ const cols = [...(block.table.cols||[])]; cols.push(''); const rows = block.table.rows.map(r=>[...r,'']); onChange({ table: {...block.table, cols, rows }});}
+  function addCol(){
+    const cols = [...(block.table.cols||[])];
+    cols.push('');
+    const rows = block.table.rows.map(r=>[...r,'']);
+    onChange({ table: {...block.table, cols, rows }});
+  }
   function updateCell(r,c,val){ const rows = block.table.rows.map((row,ri)=> ri===r ? row.map((cell,ci)=> ci===c? val : cell) : row ); onChange({ table: {...block.table, rows }});}
   function updateHeader(i,val){ const cols = block.table.cols.map((h,hi)=> hi===i? val:h); onChange({ table: {...block.table, cols }});}
   function removeRow(i){ const rows = block.table.rows.filter((_,ri)=>ri!==i); onChange({ table: {...block.table, rows }});}
@@ -461,18 +418,18 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   return (
     <div style={{marginBottom:12, position:'relative'}}>
       <div style={{position:'absolute', right:6, top:6, display:'flex', gap:6}}>
-        <button onClick={e=>{e.stopPropagation(); onRemove();}} title="Delete Block" style={{width:'32px', height:'32px', border:'1px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center'}}>🗑️</button>
+        <button onClick={e=>{e.stopPropagation(); onRemove();}} title="Delete Block" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
       </div>
 
       {block.type==='h1' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='h2' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='h3' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='p' && <textarea value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left', resize:'none', minHeight:'20px'}} />}
-      {block.type==='fact' && <div className="fact" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
+      {block.type==='fact' && <div className={selected ? "fact fact-editing" : "fact"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
       {block.type==='citation' && <div className="citation" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
 
       {block.type==='stat-grid' && (
-        <div className="stat-grid">
+        <div className={selected ? "stat-grid stat-grid-editing" : "stat-grid"}>
           {(block.stats||[]).map((s,idx)=> (
             <div className="stat" key={idx} style={{direction:'ltr'}}>
               <div className="big" contentEditable suppressContentEditableWarning={true} onInput={e=>{
@@ -551,8 +508,8 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       {block.type==='table' && (
         <div>
           <div style={{display:'flex', gap:8, marginBottom:8, alignItems:'center'}}>
-            <button onClick={e=>{e.stopPropagation(); addRow();}} title="Add Row" style={{width:'32px', height:'32px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center'}}>➕</button>
-            <button onClick={e=>{e.stopPropagation(); addCol();}} title="Add Column" style={{width:'32px', height:'32px', border:'1px solid #ddd', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center'}}>➕</button>
+            <button onClick={e=>{e.stopPropagation(); addRow();}} title="Add Row" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
+            <button onClick={e=>{e.stopPropagation(); addCol();}} title="Add Column" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
             {selectedCell && (
               <button
                 className="bold-button"
@@ -589,7 +546,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
               borderRadius: '8px',
               overflow: 'hidden',
               lineHeight: 1.4,
-              fontFamily: 'Helvetica, Arial, sans-serif'
+              fontFamily: 'Helvetica'
             }}
           >
             <thead>
@@ -602,11 +559,11 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   <th key={hi} style={{
                     width: colWidths[hi] || 'auto',
                     position: 'relative',
-                    padding: '10px 12px',
+                    padding: '8px 10px',
                     textAlign: 'left',
                     fontWeight: 700,
                     borderRight: hi < (block.table.cols||[]).length - 1 ? '1.5px solid #000000' : 'none',
-                    fontFamily: 'Helvetica, Arial, sans-serif'
+                    fontFamily: 'Helvetica'
                   }}>
                     {editingHeader === hi ? (
                       <div
@@ -626,7 +583,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           padding: 0,
                           fontSize: 'inherit',
                           outline: 'none',
-                          fontFamily: 'Helvetica, Arial, sans-serif',
+                          fontFamily: 'Helvetica',
                           minHeight: '20px',
                           wordWrap: 'break-word',
                           overflowWrap: 'break-word',
@@ -651,7 +608,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         {h || 'Click to edit'}
                       </span>
                     )}
-                    <button onClick={e=>{e.stopPropagation(); removeCol(hi);}} title="Delete Column" style={{position:'absolute', top:'2px', right:'2px', width:'16px', height:'16px', border:'1px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'8px', display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+                    <button onClick={e=>{e.stopPropagation(); removeCol(hi);}} title="Delete Column" style={{position:'absolute', top:'2px', right:'2px', width:'16px', height:'16px', border:'1px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'8px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.1)'}}>×</button>
                     {hi < (block.table.cols||[]).length - 1 && (
                       <div
                         onMouseDown={e => handleResizeStart(hi, e)}
@@ -689,10 +646,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   {r.map((c,ci)=>(
                     <td key={ci} style={{
                       width: colWidths[ci] || 'auto',
-                      padding: '10px 12px',
+                      padding: '8px 10px',
                       borderTop: '1.5px solid rgb(0, 0, 0)',
                       borderRight: ci < r.length - 1 ? '1.5px solid #000' : 'none',
-                      fontFamily: 'Helvetica, Arial, sans-serif'
+                      fontFamily: 'Helvetica'
                     }}>
                       <div
                         ref={el => {
@@ -768,7 +725,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           fontWeight: boldCells.has(`${ri}-${ci}`) ? 'bold' : 'normal',
                           fontSize: '16px',
                           padding: '2px',
-                          fontFamily: 'Helvetica, Arial, sans-serif',
+                          fontFamily: 'Helvetica',
                           minHeight: '20px',
                           wordWrap: 'break-word',
                           overflowWrap: 'break-word',
@@ -796,7 +753,8 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                       style={{
                         width:'16px',
                         height:'16px',
-                        border:'1px solid #ff4444',
+                        border:'1px solid #666',
+                        boxShadow:'0 1px 2px rgba(0,0,0,0.1)',
                         borderRadius:'50%',
                         background:'#ff4444',
                         color:'white',
@@ -818,11 +776,11 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       )}
 
       {block.type==='timeline' && (
-        <div className="timeline">
+        <div className={selected ? "timeline timeline-editing" : "timeline"}>
           {(block.events||[]).map((ev,idx)=>(
             <div className="timeline-event" key={idx} style={{display:'flex',gap:12,marginBottom:8}}>
-              <input value={ev.year} onChange={e=>updateEvent(idx,'year',e.target.value)} style={{width:80}} />
-              <input value={ev.desc} onChange={e=>updateEvent(idx,'desc',e.target.value)} style={{flex:1}} />
+              <input value={ev.year} onChange={e=>updateEvent(idx,'year',e.target.value)} style={{width:80, fontFamily:'Helvetica', border:'none', background:'transparent', outline:'none', padding:'4px', fontSize:'16px'}} />
+              <input value={ev.desc} onChange={e=>updateEvent(idx,'desc',e.target.value)} style={{flex:1, fontFamily:'Helvetica', border:'none', background:'transparent', outline:'none', padding:'4px', fontSize:'16px'}} />
             </div>
           ))}
         </div>
@@ -882,7 +840,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   border-radius: 8px !important;
   overflow: hidden !important;
   line-height: 1.4 !important;
-  font-family: Helvetica, Arial, sans-serif !important;
+  font-family: Helvetica !important;
 }
 .a4 table.editing-table thead tr {
   background: ${theme} !important;
@@ -890,20 +848,21 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   line-height: 1.4 !important;
 }
 .a4 table.editing-table thead th {
-  padding: 10px 12px !important;
+  padding: 8px 10px !important;
   text-align: left !important;
   font-weight: 700 !important;
   border-right: 1.5px solid #000000 !important;
-  font-family: Helvetica, Arial, sans-serif !important;
+  font-family: Helvetica !important;
+  direction: ltr !important;
 }
 .a4 table.editing-table thead th:last-child {
   border-right: none !important;
 }
 .a4 table.editing-table tbody td {
-  padding: 10px 12px !important;
+  padding: 8px 10px !important;
   border-top: 1.5px solid rgb(0, 0, 0) !important;
   border-right: 1.5px solid #000 !important;
-  font-family: Helvetica, Arial, sans-serif !important;
+  font-family: Helvetica !important;
 }
 .a4 table.editing-table tbody td:last-child {
   border-right: none !important;
@@ -920,9 +879,9 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   width: 100% !important;
   border: none !important;
   background: transparent !important;
-  padding: 2px !important;
+  padding: 0 !important;
   font-size: 16px !important;
-  font-family: Helvetica, Arial, sans-serif !important;
+  font-family: Helvetica !important;
   outline: none !important;
   line-height: 1.6 !important;
   direction: ltr !important;
@@ -955,7 +914,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   padding: 0 !important;
   font-size: inherit !important;
   outline: none !important;
-  font-family: Helvetica, Arial, sans-serif !important;
+  font-family: Helvetica !important;
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: normal !important;
@@ -975,6 +934,11 @@ h1[contenteditable], h2[contenteditable], h3[contenteditable], p[contenteditable
 table, table *, td, td *, th, th *, .stat, .stat *, .stat-grid, .stat-grid * { direction: ltr !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
 table td, table th { text-align: left !important; }
 .stat .big, .stat .sub { text-align: center !important; }
+
+/* Word-like borderless editing */
+.fact-editing { border-left: 3px solid ${theme}; background: rgba(255,255,255,0.8); }
+.stat-grid-editing .stat { border: 1px dashed #ccc; background: rgba(255,255,255,0.9); }
+.timeline-editing { border-left: 2px dashed ${theme}; background: rgba(255,255,255,0.8); }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
 }
 
