@@ -4,7 +4,9 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${escapeHtml(b.html||" ")}</p>`; if (b.type === "fact") return `<div class="fact">${escapeHtml(b.html||" ")}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat"><div class="big">${escapeHtml(s.value)}</div><div class="sub">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:10px 12px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica,Arial,sans-serif;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:10px 12px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica,Arial,sans-serif; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica,Arial,sans-serif;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${escapeHtml(b.html||" ")}</div>`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+// Simple fix based on Stack Overflow research - just force dir attribute
+
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${escapeHtml(b.html||" ")}</p>`; if (b.type === "fact") return `<div class="fact">${escapeHtml(b.html||" ")}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:10px 12px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica,Arial,sans-serif; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:10px 12px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica,Arial,sans-serif; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica,Arial,sans-serif;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${escapeHtml(b.html||" ")}</div>`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
@@ -28,6 +30,55 @@ function A4Editor() {
     localStorage.setItem("a4.blocks.v2", JSON.stringify(blocks));
   }, [blocks]);
 
+  // NUCLEAR OPTION: Global mutation observer to force LTR on everything
+  useEffect(() => {
+    function forceLTR(element) {
+      if (element.nodeType === 1) { // Element node
+        element.style.setProperty('direction', 'ltr', 'important');
+        element.style.setProperty('unicode-bidi', 'normal', 'important');
+        element.setAttribute('dir', 'ltr');
+
+        // Special handling for specific elements
+        if (element.tagName === 'TD' || element.tagName === 'TH') {
+          element.style.setProperty('text-align', 'left', 'important');
+        }
+        if (element.classList.contains('big') || element.classList.contains('sub')) {
+          element.style.setProperty('text-align', 'center', 'important');
+        }
+      }
+    }
+
+    function forceLTROnSubtree(element) {
+      forceLTR(element);
+      for (let child of element.children) {
+        forceLTROnSubtree(child);
+      }
+    }
+
+    // Initial force on entire document
+    forceLTROnSubtree(document.documentElement);
+
+    // Set up mutation observer
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) {
+            forceLTROnSubtree(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['dir', 'style']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const existingStyle = document.getElementById("a4-style");
     if (existingStyle) {
@@ -38,6 +89,15 @@ function A4Editor() {
     styleTag.innerHTML = getStyle(theme, useThemeColor);
     document.head.appendChild(styleTag);
     console.log("Style applied:", getStyle(theme, useThemeColor).substring(0, 200) + "...");
+
+    // Force global LTR on body and html elements immediately
+    document.documentElement.style.setProperty('direction', 'ltr', 'important');
+    document.documentElement.style.setProperty('unicode-bidi', 'normal', 'important');
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.body.style.setProperty('direction', 'ltr', 'important');
+    document.body.style.setProperty('unicode-bidi', 'normal', 'important');
+    document.body.setAttribute('dir', 'ltr');
+
     return () => {
       const style = document.getElementById("a4-style");
       if (style) style.remove();
@@ -54,7 +114,7 @@ function A4Editor() {
     if (type === "h2") base.html = "Heading 2";
     if (type === "h3") base.html = "Heading 3";
     if (type === "p") base.html = "Start typing your paragraph...";
-    if (type === "table") base.table = { cols: ["Header 1", "Header 2", "Header 3"], rows: [["Cell 1", "Cell 2", "Cell 3"], ["Cell 4", "Cell 5", "Cell 6"], ["Cell 7", "Cell 8", "Cell 9"]], colWidths: {}, boldCells: new Set() };
+    if (type === "table") base.table = { cols: ["Header 1", "Header 2", "Header 3"], rows: [["Cell 1", "Cell 2", "Cell 3"], ["Cell 4", "Cell 5", "Cell 6"], ["Cell 7", "Cell 8", "Cell 9"]], colWidths: {}, boldCells: [] };
     if (type === "stat-grid") base.stats = [
       { title: "Metric 1", value: "123" },
       { title: "Metric 2", value: "456" },
@@ -93,7 +153,10 @@ function A4Editor() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Exported A4</title>
-<style>${stylesheet}</style>
+<style>
+body { margin:0; padding:18px; background:#f6f7f8; min-height:100vh; }
+${stylesheet}
+</style>
 </head>
 <body>
 <div class="a4">
@@ -206,8 +269,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     const stored = block.table?.boldCells;
     if (Array.isArray(stored)) {
       return new Set(stored);
-    } else if (stored instanceof Set) {
-      return new Set(stored);
     } else {
       return new Set();
     }
@@ -217,8 +278,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   useEffect(() => {
     const stored = block.table?.boldCells;
     if (Array.isArray(stored)) {
-      setBoldCells(new Set(stored));
-    } else if (stored instanceof Set) {
       setBoldCells(new Set(stored));
     }
   }, [block.table?.boldCells]);
@@ -277,20 +336,32 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
   // Force LTR direction on all contentEditable elements
   useEffect(() => {
-    if (selected && block.type === 'table') {
+    if (selected) {
       const interval = setInterval(() => {
-        // Target specifically table cell contentEditables
-        const tableCells = document.querySelectorAll('.editing-table td [contenteditable="true"]');
-        tableCells.forEach(el => {
-          if (el.style.direction !== 'ltr') {
-            el.style.direction = 'ltr';
-            el.style.textAlign = 'left';
-            el.style.unicodeBidi = 'normal';
+        // Target table cells
+        if (block.type === 'table') {
+          const tableCells = document.querySelectorAll('.editing-table td [contenteditable="true"], .editing-table th [contenteditable="true"]');
+          tableCells.forEach(el => {
+            el.style.setProperty('direction', 'ltr', 'important');
+            el.style.setProperty('text-align', 'left', 'important');
+            el.style.setProperty('unicode-bidi', 'normal', 'important');
+            el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
             el.setAttribute('dir', 'ltr');
-            console.log('Fixed LTR for cell:', el);
-          }
-        });
-      }, 100);
+          });
+        }
+
+        // Target stat boxes
+        if (block.type === 'stat-grid') {
+          const statElements = document.querySelectorAll('.stat [contenteditable="true"]');
+          statElements.forEach(el => {
+            el.style.setProperty('direction', 'ltr', 'important');
+            el.style.setProperty('text-align', 'center', 'important');
+            el.style.setProperty('unicode-bidi', 'normal', 'important');
+            el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+            el.setAttribute('dir', 'ltr');
+          });
+        }
+      }, 50);
 
       return () => clearInterval(interval);
     }
@@ -403,13 +474,75 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       {block.type==='stat-grid' && (
         <div className="stat-grid">
           {(block.stats||[]).map((s,idx)=> (
-            <div className="stat" key={idx}>
-              <div className="big" contentEditable onInput={e=>{
-                const stats = [...(block.stats||[])]; stats[idx].value = e.currentTarget.textContent; onChange({ stats });
-              }}>{s.value}</div>
-              <div className="sub" contentEditable onInput={e=>{
-                const stats = [...(block.stats||[])]; stats[idx].title = e.currentTarget.textContent; onChange({ stats });
-              }}>{s.title}</div>
+            <div className="stat" key={idx} style={{direction:'ltr'}}>
+              <div className="big" contentEditable suppressContentEditableWarning={true} onInput={e=>{
+                // CURSOR FIX for stat box
+                const element = e.currentTarget;
+                const selection = window.getSelection();
+                const cursorPos = selection.anchorOffset;
+                let text = element.textContent || '';
+
+                console.log('📊 STAT BOX CURSOR FIX - Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
+
+                element.setAttribute('dir', 'ltr');
+                element.style.direction = 'ltr';
+
+                const stats = [...(block.stats||[])]; stats[idx].value = text; onChange({ stats });
+
+                // Restore cursor to end of text
+                requestAnimationFrame(() => {
+                  element.setAttribute('dir', 'ltr');
+                  element.style.direction = 'ltr';
+
+                  const range = document.createRange();
+                  const sel = window.getSelection();
+
+                  if (element.childNodes.length > 0) {
+                    range.setStart(element.childNodes[0], element.textContent.length);
+                  } else {
+                    range.setStart(element, 0);
+                  }
+                  range.collapse(true);
+                  sel.removeAllRanges();
+                  sel.addRange(range);
+
+                  console.log('📊 Stat box cursor restored to end');
+                });
+              }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.value}</div>
+              <div className="sub" contentEditable suppressContentEditableWarning={true} onInput={e=>{
+                // CURSOR FIX for stat box subtitle
+                const element = e.currentTarget;
+                const selection = window.getSelection();
+                const cursorPos = selection.anchorOffset;
+                let text = element.textContent || '';
+
+                console.log('📊 STAT BOX SUB CURSOR FIX - Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
+
+                element.setAttribute('dir', 'ltr');
+                element.style.direction = 'ltr';
+
+                const stats = [...(block.stats||[])]; stats[idx].title = text; onChange({ stats });
+
+                // Restore cursor to end of text
+                requestAnimationFrame(() => {
+                  element.setAttribute('dir', 'ltr');
+                  element.style.direction = 'ltr';
+
+                  const range = document.createRange();
+                  const sel = window.getSelection();
+
+                  if (element.childNodes.length > 0) {
+                    range.setStart(element.childNodes[0], element.textContent.length);
+                  } else {
+                    range.setStart(element, 0);
+                  }
+                  range.collapse(true);
+                  sel.removeAllRanges();
+                  sel.addRange(range);
+
+                  console.log('📊 Stat box subtitle cursor restored to end');
+                });
+              }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.title}</div>
             </div>
           ))}
         </div>
@@ -576,24 +709,43 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         suppressContentEditableWarning
                         dir="ltr"
                         onInput={e => {
-                          // Force LTR direction on input
+                          // ROOT CAUSE FIX: Cursor position issue in React contentEditable
                           const element = e.target;
-                          element.style.direction = 'ltr';
-                          element.style.textAlign = 'left';
-                          element.style.unicodeBidi = 'normal';
-                          element.setAttribute('dir', 'ltr');
 
-                          // Get the text
+                          // Save cursor position BEFORE getting text
+                          const selection = window.getSelection();
+                          const cursorPos = selection.anchorOffset;
+
                           let text = element.textContent || '';
 
-                          // Force LTR again after a tiny delay
-                          requestAnimationFrame(() => {
-                            element.style.direction = 'ltr';
-                            element.style.textAlign = 'left';
-                            element.setAttribute('dir', 'ltr');
-                          });
+                          console.log('🔧 CURSOR FIX - Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
+
+                          // Force proper cursor positioning
+                          element.setAttribute('dir', 'ltr');
+                          element.style.direction = 'ltr';
 
                           updateCell(ri,ci,text);
+
+                          // CRITICAL: Restore cursor to the END of text after React update
+                          requestAnimationFrame(() => {
+                            element.setAttribute('dir', 'ltr');
+                            element.style.direction = 'ltr';
+
+                            // Move cursor to end of text
+                            const range = document.createRange();
+                            const sel = window.getSelection();
+
+                            if (element.childNodes.length > 0) {
+                              range.setStart(element.childNodes[0], element.textContent.length);
+                            } else {
+                              range.setStart(element, 0);
+                            }
+                            range.collapse(true);
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+
+                            console.log('🔧 Cursor restored to end of text');
+                          });
                         }}
                         onFocus={() => setSelectedCell({r: ri, c: ci})}
                         onBlur={(e) => {
@@ -682,16 +834,42 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 // --- Full stylesheet including timeline & citation ---
 function getStyle(theme, useThemeColor = false){
   return `
-.a4 { width:21cm; max-width:95%; min-height:29.7cm; padding:0.6cm; background:white; margin:10px auto; font-family:Helvetica; font-size:16px; line-height:1.6; direction:ltr; text-align:left; }
+/* NUCLEAR RTL OVERRIDE - DO NOT REMOVE */
+html, body, *, *::before, *::after {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  text-align: left !important;
+  writing-mode: horizontal-tb !important;
+}
+div, span, p, h1, h2, h3, h4, h5, h6, table, td, th, input, textarea {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+table td, table th {
+  text-align: left !important;
+}
+.stat .big, .stat .sub {
+  text-align: center !important;
+}
+[contenteditable], [contenteditable] * {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+/* END NUCLEAR RTL OVERRIDE */
+
+.a4 { width:21cm; max-width:95%; min-height:29.7cm; padding:0.6cm; background:white; margin:10px auto; font-family:Helvetica; font-size:16px; line-height:1.6; direction:ltr !important; text-align:left !important; }
 h1 { font-size:38px; font-weight:bold; margin-top:0; margin-bottom:20px; line-height:1.3; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; }
 .fact { border-left:6px solid ${theme}; padding:12px 16px; margin:10px 0; }
-.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; }
-.stat { text-align:center; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:${theme}27; }
-.stat .big { font-size:28px; color:${theme}; font-weight:800; line-height:1.1; }
-.stat .sub { font-size:14px; color:${theme}; line-height:1.3; margin:10px 0; }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; direction:ltr !important; }
+.stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:${theme}27; direction:ltr !important; unicode-bidi:normal !important; }
+.stat .big { font-size:28px; color:${theme}; font-weight:800; line-height:1.1; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.stat .sub { font-size:14px; color:${theme}; line-height:1.3; margin:10px 0; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.stat * { direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
 .a4 table.editing-table,
 .a4 table.editing-table * {
   border-collapse: separate !important;
@@ -750,6 +928,21 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+.a4 table.editing-table tbody td,
+.a4 table.editing-table tbody td * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+.a4 table.editing-table thead th,
+.a4 table.editing-table thead th * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
 }
 .a4 table.editing-table thead th input,
 .a4 table.editing-table thead th div[contenteditable],
@@ -779,6 +972,9 @@ h1[contenteditable], h2[contenteditable], h3[contenteditable], p[contenteditable
 .a4 h1[contenteditable], .a4 h2[contenteditable], .a4 h3[contenteditable], .a4 p[contenteditable], .a4 div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
 * { unicode-bidi: normal !important; }
 *[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
+table, table *, td, td *, th, th *, .stat, .stat *, .stat-grid, .stat-grid * { direction: ltr !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
+table td, table th { text-align: left !important; }
+.stat .big, .stat .sub { text-align: center !important; }
 `;
 }
 

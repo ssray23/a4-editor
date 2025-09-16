@@ -189,9 +189,10 @@ npm run build
 - Bold formatting in table cells
 - Column resizing and row/column management
 
-### 🔄 Known Issues
-- Text direction issue in contentEditable elements (affects table cells and stat grids)
-- Some browsers may display reversed text input in specific scenarios
+### 🔄 Recent Updates
+- ✅ Fixed React contentEditable warnings
+- ✅ HTML export now matches editor appearance exactly with gray background
+- ✅ Resolved console warnings for better developer experience
 
 ### 🎯 Future Enhancements
 - Fix text direction issues
