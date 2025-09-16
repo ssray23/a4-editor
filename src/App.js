@@ -636,49 +636,63 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     });
   });
 
-
-  function onInput(e){ // <-- Accept event object
+  // --- START: FIXED onInput FUNCTION ---
+  function onInput(e) {
     const element = e.currentTarget;
+
+    // Save the current cursor position as a character offset
+    const selection = window.getSelection();
+    let caretOffset = 0;
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      const preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(element);
+      preCaretRange.setEnd(range.startContainer, range.startOffset);
+      caretOffset = preCaretRange.toString().length;
+    }
+
     const html = element.innerHTML || '';
-
-    // Force LTR on every input
-    element.style.direction = 'ltr';
-    element.style.textAlign = 'left';
-    element.style.unicodeBidi = 'normal';
-    element.setAttribute('dir', 'ltr');
-
     onChange({ html });
 
-    // CRITICAL: Restore cursor to the END of text after React re-renders
-    // This is the same logic used in the table cells to prevent RTL typing.
+    // Restore the cursor position after React's re-render has completed
     requestAnimationFrame(() => {
-        element.setAttribute('dir', 'ltr');
-        element.style.direction = 'ltr';
+      if (!document.contains(element)) return; // Exit if element is no longer in the DOM
 
-        try {
-            const range = document.createRange();
-            const sel = window.getSelection();
+      try {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        
+        // Use a TreeWalker to find the correct text node and offset
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        let charCount = 0;
+        let found = false;
 
-            if (element.childNodes.length > 0) {
-                const lastChild = element.childNodes[element.childNodes.length - 1];
-                if (lastChild.nodeType === Node.TEXT_NODE) {
-                    range.setStart(lastChild, lastChild.textContent.length);
-                } else {
-                    range.setStart(element, element.childNodes.length);
-                }
-            } else {
-                range.setStart(element, 0);
-            }
-
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          const nodeLength = node.textContent.length;
+          if (charCount + nodeLength >= caretOffset) {
+            range.setStart(node, caretOffset - charCount);
             range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        } catch (err) {
-            console.warn('Could not restore cursor position:', err);
+            found = true;
+            break;
+          }
+          charCount += nodeLength;
         }
+        
+        // If not found (e.g., empty element or at the very end), place cursor at the end
+        if (!found) {
+          range.selectNodeContents(element);
+          range.collapse(false);
+        }
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } catch (err) {
+        console.warn('Failed to restore cursor position:', err);
+      }
     });
   }
-
+  // --- END: FIXED onInput FUNCTION ---
 
   // Table helpers
   function addRow(){ const rows = [...(block.table.rows||[])]; const cols = block.table.cols||[]; rows.push(cols.map(()=>"")); onChange({ table: {...block.table, rows }});}
