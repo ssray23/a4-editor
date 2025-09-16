@@ -40,6 +40,8 @@ function A4Editor() {
   const [hasTextSelection, setHasTextSelection] = useState(false);
   const [showBoldButton, setShowBoldButton] = useState(false);
   const [isBoldActive, setIsBoldActive] = useState(false);
+  const [showListButton, setShowListButton] = useState(false);
+  const [isListActive, setIsListActive] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("a4.blocks.v2", JSON.stringify(blocks));
@@ -66,10 +68,15 @@ function A4Editor() {
         focusedElement.closest('[contenteditable="true"]')
       );
 
+      // Check if we're in a block type that supports lists (para, card, fact, citation)
+      const selectedBlock = blocks.find(b => b.id === selected);
+      const supportsLists = selectedBlock && ['p', 'card', 'fact', 'citation'].includes(selectedBlock.type);
+
       setHasTextSelection(hasSelection);
       setShowBoldButton(hasSelection || isInContentEditable);
+      setShowListButton((hasSelection || isInContentEditable) && supportsLists);
 
-      // If button is visible, check the bold state of the selection/cursor
+      // If button is visible, check the bold state and list state of the selection/cursor
       if ((hasSelection || isInContentEditable) && selection && selection.rangeCount > 0) {
         try {
           const range = selection.getRangeAt(0);
@@ -82,12 +89,18 @@ function A4Editor() {
           const isBold = parent.closest('strong, b') ||
                        parseInt(window.getComputedStyle(parent).fontWeight) >= 700;
 
+          // Check if we're in a list
+          const inList = !!parent.closest('ul, ol');
+
           setIsBoldActive(!!isBold);
+          setIsListActive(inList);
         } catch (e) {
           setIsBoldActive(false);
+          setIsListActive(false);
         }
       } else {
         setIsBoldActive(false);
+        setIsListActive(false);
       }
     }
 
@@ -128,7 +141,7 @@ function A4Editor() {
       document.removeEventListener('focusin', handleFocusChange);
       document.removeEventListener('focusout', handleFocusChange);
     };
-  }, []); // <-- An empty dependency array fixes the disappearing button bug.
+  }, [blocks, selected]); // Add dependencies so it can check the selected block type
   // --- END OF NEW CODE ---
 
   function handleGlobalBold(e) {
@@ -168,6 +181,52 @@ function A4Editor() {
       focusedElement.closest('[contenteditable="true"]')
     )) {
       document.execCommand('bold', false, null);
+    }
+  }
+
+  function handleGlobalList(e) {
+    e.preventDefault(); // Prevent the button from taking focus
+
+    const selection = window.getSelection();
+    const focusedElement = document.activeElement;
+
+    // Check if we're in a block that supports lists
+    const selectedBlock = blocks.find(b => b.id === selected);
+    if (!selectedBlock || !['p', 'card', 'fact', 'citation'].includes(selectedBlock.type)) {
+      return;
+    }
+
+    // If we have a selection, work with that
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+
+      // Get the parent element that's contentEditable
+      const parentElement = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+        ? range.commonAncestorContainer.parentElement
+        : range.commonAncestorContainer;
+
+      // Find the contentEditable element
+      const contentEditableElement = parentElement.closest('[contenteditable="true"]');
+
+      if (contentEditableElement) {
+        // Focus the contentEditable element first
+        contentEditableElement.focus();
+
+        // Restore the selection
+        const newSelection = window.getSelection();
+        newSelection.removeAllRanges();
+        newSelection.addRange(range);
+
+        // Toggle list formatting
+        document.execCommand('insertUnorderedList', false, null);
+      }
+    }
+    // If no selection but cursor is in contentEditable, just apply list
+    else if (focusedElement && (
+      focusedElement.contentEditable === 'true' ||
+      focusedElement.closest('[contenteditable="true"]')
+    )) {
+      document.execCommand('insertUnorderedList', false, null);
     }
   }
 
@@ -428,27 +487,35 @@ ${body}
         <div style={{display:'flex', gap:12, alignItems:'center'}}>
           <h3 style={{margin:0}}>A4 Editor</h3>
           <div style={{display:'flex', gap:8, alignItems:'center'}}>
-            <label style={{fontSize:13}}>Theme</label>
-            <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎨</button>
-            <button onClick={() => setUseThemeColor(s => !s)} title={useThemeColor ? "Use Black Headings" : "Use Theme Color Headings"} style={{width:'40px', height:'40px', border:'2px solid ' + (useThemeColor ? theme : '#333'), borderRadius:'50%', background: useThemeColor ? theme : 'white', color: useThemeColor ? 'white' : 'black', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>H</button>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎨</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Colour</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={() => setUseThemeColor(s => !s)} title={useThemeColor ? "Use Black Headings" : "Use Theme Color Headings"} style={{width:'40px', height:'40px', border:'2px solid ' + (useThemeColor ? theme : '#333'), borderRadius:'50%', background: useThemeColor ? theme : 'white', color: useThemeColor ? 'white' : 'black', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>H</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Theme</span>
+            </div>
             {showBoldButton && (
-              <button onMouseDown={handleGlobalBold} title="Bold Text (Ctrl+B)" style={{
-                width:'40px',
-                height:'40px',
-                border: isBoldActive ? '2px solid #333' : '2px solid #666',
-                borderRadius:'50%',
-                background: isBoldActive ? '#333' : 'white',
-                color: isBoldActive ? 'white' : '#333',
-                cursor:'pointer',
-                fontSize:'18px',
-                fontWeight:'bold',
-                display:'flex',
-                alignItems:'center',
-                justifyContent:'center',
-                boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
-                animation:'fadeIn 0.2s ease',
-                transition: 'all 0.2s ease'
-              }}>B</button>
+              <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+                <button onMouseDown={handleGlobalBold} title="Bold Text (Ctrl+B)" style={{
+                  width:'40px',
+                  height:'40px',
+                  border: isBoldActive ? '2px solid #333' : '2px solid #666',
+                  borderRadius:'50%',
+                  background: isBoldActive ? '#333' : 'white',
+                  color: isBoldActive ? 'white' : '#333',
+                  cursor:'pointer',
+                  fontSize:'18px',
+                  fontWeight:'bold',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                  animation:'fadeIn 0.2s ease',
+                  transition: 'all 0.2s ease'
+                }}>B</button>
+                <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Bold</span>
+              </div>
             )}
             {showColorPicker && (
               <div style={{ position: 'absolute', zIndex: 1000, top: '50px', left: '-10px' }}>
@@ -456,18 +523,75 @@ ${body}
                 <SketchPicker color={theme} onChangeComplete={color => setTheme(color.hex)} />
               </div>
             )}
-            <button onClick={()=>addBlock('h1')} title="Add H1" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📝</button>
-            <button onClick={()=>addBlock('h2')} title="Add H2" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📄</button>
-            <button onClick={()=>addBlock('h3')} title="Add H3" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'12px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📃</button>
-            <button onClick={()=>addBlock('p')} title="Add Paragraph" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📄</button>
-            <button onClick={()=>addBlock('table')} title="Add Table" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📊</button>
-            <button onClick={()=>addBlock('stat-grid')} title="Add Stat Grid" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📈</button>
-            <button onClick={()=>addBlock('fact')} title="Add Fact Box" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>💡</button>
-            <button onClick={()=>addBlock('card')} title="Add Card" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎴</button>
-            <button onClick={()=>addBlock('timeline')} title="Add Timeline" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>⏰</button>
-            <button onClick={()=>addBlock('citation')} title="Add Citation" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📚</button>
-            <button onClick={()=>addBlock('hr')} title="Add Horizontal Line" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➖</button>
-            <button onClick={clearAll} title="Clear All Content" style={{width:'40px', height:'40px', border:'2px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('h1')} title="Add H1" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📝</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>H1</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('h2')} title="Add H2" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📄</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>H2</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('h3')} title="Add H3" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'12px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📃</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>H3</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('p')} title="Add Paragraph" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📄</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Para</span>
+            </div>
+            {showListButton && (
+              <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+                <button onMouseDown={handleGlobalList} title="Toggle Bullet List" style={{
+                  width:'40px',
+                  height:'40px',
+                  border: isListActive ? '2px solid #333' : '2px solid #666',
+                  borderRadius:'50%',
+                  background: isListActive ? '#333' : 'white',
+                  color: isListActive ? 'white' : '#333',
+                  cursor:'pointer',
+                  fontSize:'16px',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                  animation:'fadeIn 0.2s ease',
+                  transition: 'all 0.2s ease'
+                }}>📋</button>
+                <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>List</span>
+              </div>
+            )}
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('table')} title="Add Table" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📊</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Table</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('stat-grid')} title="Add Stat Grid" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📈</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Stats</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('fact')} title="Add Fact Box" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>💡</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Fact</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('card')} title="Add Card" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎴</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Card</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('timeline')} title="Add Timeline" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>⏰</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Time</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('citation')} title="Add Citation" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📚</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Cite</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={()=>addBlock('hr')} title="Add Horizontal Line" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➖</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Line</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={clearAll} title="Clear All Content" style={{width:'40px', height:'40px', border:'2px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Clear</span>
+            </div>
             <label style={{background:'white', color:'#333', border:'2px solid #666', borderRadius:'25px', padding:'12px 24px', cursor:'pointer', fontSize:'14px', fontWeight:'600', fontFamily:'Helvetica', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>
               📥 Import HTML
               <input type="file" accept=".html" onChange={importHtml} style={{display:'none'}} />
@@ -653,63 +777,43 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     });
   });
 
-  // --- START: FIXED onInput FUNCTION ---
+  // --- START: SIMPLIFIED onInput FUNCTION ---
   function onInput(e) {
     const element = e.currentTarget;
-
-    // Save the current cursor position as a character offset
-    const selection = window.getSelection();
-    let caretOffset = 0;
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(element);
-      preCaretRange.setEnd(range.startContainer, range.startOffset);
-      caretOffset = preCaretRange.toString().length;
-    }
-
     const html = element.innerHTML || '';
+
+    // Only restore cursor position if React actually changes the DOM content
+    // Skip cursor restoration for natural typing, Enter key, and backspace
+    const currentHtml = element.innerHTML;
+
     onChange({ html });
 
-    // Restore the cursor position after React's re-render has completed
+    // Only restore cursor if the DOM content would be different after React update
     requestAnimationFrame(() => {
-      if (!document.contains(element)) return; // Exit if element is no longer in the DOM
+      if (!document.contains(element)) return;
 
+      // If innerHTML hasn't changed, React didn't modify the DOM, so don't interfere with cursor
+      if (element.innerHTML === currentHtml) {
+        return;
+      }
+
+      // Otherwise, try to maintain cursor position (for cases where React did change the DOM)
       try {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        
-        // Use a TreeWalker to find the correct text node and offset
-        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-        let charCount = 0;
-        let found = false;
-
-        while (walker.nextNode()) {
-          const node = walker.currentNode;
-          const nodeLength = node.textContent.length;
-          if (charCount + nodeLength >= caretOffset) {
-            range.setStart(node, caretOffset - charCount);
-            range.collapse(true);
-            found = true;
-            break;
-          }
-          charCount += nodeLength;
-        }
-        
-        // If not found (e.g., empty element or at the very end), place cursor at the end
-        if (!found) {
+        const selection = window.getSelection();
+        if (selection.rangeCount === 0) {
+          // If no selection, place cursor at end
+          const range = document.createRange();
           range.selectNodeContents(element);
           range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
         }
-
-        sel.removeAllRanges();
-        sel.addRange(range);
       } catch (err) {
-        console.warn('Failed to restore cursor position:', err);
+        console.warn('Failed to maintain cursor position:', err);
       }
     });
   }
-  // --- END: FIXED onInput FUNCTION ---
+  // --- END: SIMPLIFIED onInput FUNCTION ---
 
   // Table helpers
   function addRow(){ const rows = [...(block.table.rows||[])]; const cols = block.table.cols||[]; rows.push(cols.map(()=>"")); onChange({ table: {...block.table, rows }});}
@@ -1263,6 +1367,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
           ))}
         </div>
       )}
+
     </div>
   );
 }
@@ -1401,6 +1506,9 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   text-align: left !important;
   unicode-bidi: normal !important;
 }
+.bullet-list { padding-left:24px; margin:10px 0; direction:ltr !important; text-align:left !important; unicode-bidi:normal !important; font-family:Helvetica; }
+.bullet-list li { margin-bottom:6px; direction:ltr !important; text-align:left !important; unicode-bidi:normal !important; line-height:1.6; }
+.bullet-list-editing { background:rgba(255,255,255,0.8); border-radius:4px; padding:8px; }
 .timeline { border-left:3px solid ${theme}; margin:12px 0; padding-left:16px; font-family:Helvetica; }
 .timeline-event { display:flex; gap:12px; margin-bottom:12px; font-family:Helvetica; }
 .timeline-event .year { font-weight:700; width:60px; color:${theme}; font-family:Helvetica; }
