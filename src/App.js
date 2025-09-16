@@ -6,13 +6,25 @@ function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'
 
 // Simple fix based on Stack Overflow research - just force dir attribute
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${escapeHtml(b.html||" ")}</p>`; if (b.type === "fact") return `<div class="fact">${escapeHtml(b.html||" ")}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${escapeHtml(c) || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${escapeHtml(b.html||" ")}</div>`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${escapeHtml(b.html||" ")}</h1>`; if (b.type === "h2") return `<h2>${escapeHtml(b.html||" ")}</h2>`; if (b.type === "h3") return `<h3>${escapeHtml(b.html||" ")}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
-  const [theme, setTheme] = useState(defaultTheme);
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem("a4.theme") || defaultTheme;
+    } catch (e) {
+      return defaultTheme;
+    }
+  });
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [useThemeColor, setUseThemeColor] = useState(false);
+  const [useThemeColor, setUseThemeColor] = useState(() => {
+    try {
+      return localStorage.getItem("a4.useThemeColor") === "true";
+    } catch (e) {
+      return false;
+    }
+  });
   const [blocks, setBlocks] = useState(() => {
     try {
       const raw = localStorage.getItem("a4.blocks.v2");
@@ -25,10 +37,135 @@ function A4Editor() {
     }
   });
   const [selected, setSelected] = useState(null);
+  const [hasTextSelection, setHasTextSelection] = useState(false);
+  const [showBoldButton, setShowBoldButton] = useState(false);
+  const [isBoldActive, setIsBoldActive] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("a4.blocks.v2", JSON.stringify(blocks));
   }, [blocks]);
+
+  useEffect(() => {
+    localStorage.setItem("a4.theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem("a4.useThemeColor", useThemeColor.toString());
+  }, [useThemeColor]);
+
+  // Global text selection monitoring and bold functionality
+  useEffect(() => {
+    function checkSelection() {
+      const selection = window.getSelection();
+      const hasSelection = selection && selection.toString().length > 0;
+      const focusedElement = document.activeElement;
+      const isInContentEditable = focusedElement && (
+        focusedElement.contentEditable === 'true' ||
+        focusedElement.closest('[contenteditable="true"]')
+      );
+
+      setHasTextSelection(hasSelection);
+      setShowBoldButton(hasSelection || isInContentEditable);
+
+      // Check if current selection or cursor position is bold
+      if (isInContentEditable && selection.rangeCount > 0) {
+        try {
+          const range = selection.getRangeAt(0);
+          const tempElement = document.createElement('span');
+
+          // Check if we're in a bold context
+          let parent = range.commonAncestorContainer;
+          if (parent.nodeType === Node.TEXT_NODE) {
+            parent = parent.parentElement;
+          }
+
+          // Check if parent or any ancestor has bold styling
+          const isBold = parent.closest('strong, b') ||
+                        window.getComputedStyle(parent).fontWeight === 'bold' ||
+                        window.getComputedStyle(parent).fontWeight === '700';
+
+          setIsBoldActive(!!isBold);
+        } catch (e) {
+          setIsBoldActive(false);
+        }
+      } else {
+        setIsBoldActive(false);
+      }
+    }
+
+    function handleGlobalKeyDown(e) {
+      if (e.ctrlKey && e.key === 'b' && showBoldButton) {
+        e.preventDefault();
+        if (hasTextSelection) {
+          handleGlobalBold(e);
+        } else {
+          // Just apply bold at cursor position
+          document.execCommand('bold');
+        }
+      }
+    }
+
+    function handleSelectionChange() {
+      checkSelection();
+    }
+
+    function handleFocusChange() {
+      checkSelection();
+    }
+
+    // Add global event listeners
+    document.addEventListener('selectionchange', handleSelectionChange);
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    document.addEventListener('focusin', handleFocusChange);
+    document.addEventListener('focusout', handleFocusChange);
+
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+      document.removeEventListener('focusin', handleFocusChange);
+      document.removeEventListener('focusout', handleFocusChange);
+    };
+  }, [hasTextSelection, showBoldButton]);
+
+  function handleGlobalBold(e) {
+    e.preventDefault(); // Prevent the button from taking focus
+
+    const selection = window.getSelection();
+    const focusedElement = document.activeElement;
+
+    // If we have a selection, work with that
+    if (selection.rangeCount > 0 && hasTextSelection) {
+      const range = selection.getRangeAt(0);
+
+      // Get the parent element that's contentEditable
+      const parentElement = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+        ? range.commonAncestorContainer.parentElement
+        : range.commonAncestorContainer;
+
+      // Find the contentEditable element
+      const contentEditableElement = parentElement.closest('[contenteditable="true"]');
+
+      if (contentEditableElement) {
+        // Focus the contentEditable element first
+        contentEditableElement.focus();
+
+        // Restore the selection
+        const newSelection = window.getSelection();
+        newSelection.removeAllRanges();
+        newSelection.addRange(range);
+
+        // Apply bold formatting
+        document.execCommand('bold', false, null);
+      }
+    }
+    // If no selection but cursor is in contentEditable, just apply bold
+    else if (focusedElement && (
+      focusedElement.contentEditable === 'true' ||
+      focusedElement.closest('[contenteditable="true"]')
+    )) {
+      document.execCommand('bold', false, null);
+    }
+  }
 
 
   useEffect(() => {
@@ -73,12 +210,30 @@ function A4Editor() {
       { title: "Metric 3", value: "789" }
     ];
     if (type === "fact") base.html = "Important fact goes here.";
+    if (type === "card") base.html = "<strong>This is a bolded header</strong><br><br>This is some regular text that follows the header. You can select any text and use the bold button or Ctrl+B to format it. This card demonstrates how you can mix bold and regular text within the same element.";
     if (type === "timeline") base.events = [
       { year: "2025", desc: "Event 1 description" },
       { year: "2026", desc: "Event 2 description" },
     ];
     if (type === "citation") base.html = "Author. Title. Publisher. Year.";
-    setBlocks(b => [...b, base]);
+    if (type === "hr") base.html = "";
+
+    setBlocks(b => {
+      if (selected) {
+        // Insert after the currently selected block
+        const selectedIndex = b.findIndex(block => block.id === selected);
+        if (selectedIndex !== -1) {
+          const newBlocks = [...b];
+          newBlocks.splice(selectedIndex + 1, 0, base);
+          return newBlocks;
+        }
+      }
+      // If no selection or selected block not found, add at the end
+      return [...b, base];
+    });
+
+    // Auto-select the new block
+    setSelected(base.id);
   }
 
   function updateBlock(id, patch) {
@@ -125,6 +280,99 @@ ${body}
     URL.revokeObjectURL(url);
   }
 
+  function importHtml(event) {
+    const file = event.target.files[0];
+    if (!file || file.type !== 'text/html') {
+      alert('Please select a valid HTML file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const htmlContent = e.target.result;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const a4Div = doc.querySelector('.a4');
+
+        if (!a4Div) {
+          alert('This does not appear to be a valid A4 document');
+          return;
+        }
+
+        const newBlocks = [];
+        const children = a4Div.children;
+
+        for (let i = 0; i < children.length; i++) {
+          const el = children[i];
+          const id = genId();
+
+          if (el.tagName === 'H1') {
+            newBlocks.push({ id, type: 'h1', html: el.textContent || el.innerText });
+          } else if (el.tagName === 'H2') {
+            newBlocks.push({ id, type: 'h2', html: el.textContent || el.innerText });
+          } else if (el.tagName === 'H3') {
+            newBlocks.push({ id, type: 'h3', html: el.textContent || el.innerText });
+          } else if (el.tagName === 'P') {
+            newBlocks.push({ id, type: 'p', html: el.innerHTML });
+          } else if (el.classList.contains('fact')) {
+            newBlocks.push({ id, type: 'fact', html: el.innerHTML });
+          } else if (el.classList.contains('card')) {
+            newBlocks.push({ id, type: 'card', html: el.innerHTML });
+          } else if (el.classList.contains('citation')) {
+            newBlocks.push({ id, type: 'citation', html: el.innerHTML });
+          } else if (el.tagName === 'HR' && el.classList.contains('divider')) {
+            newBlocks.push({ id, type: 'hr', html: '' });
+          } else if (el.classList.contains('timeline')) {
+            const events = [];
+            const timelineEvents = el.querySelectorAll('.timeline-event');
+            timelineEvents.forEach(te => {
+              const year = te.querySelector('.year')?.textContent || '';
+              const desc = te.querySelector('.desc')?.textContent || '';
+              events.push({ year, desc });
+            });
+            newBlocks.push({ id, type: 'timeline', events });
+          } else if (el.classList.contains('stat-grid')) {
+            const stats = [];
+            const statElements = el.querySelectorAll('.stat');
+            statElements.forEach(stat => {
+              const value = stat.querySelector('.big')?.textContent || '';
+              const title = stat.querySelector('.sub')?.textContent || '';
+              stats.push({ value, title });
+            });
+            newBlocks.push({ id, type: 'stat-grid', stats });
+          } else if (el.tagName === 'TABLE') {
+            const headers = Array.from(el.querySelectorAll('thead th')).map(th => th.textContent || '');
+            const rows = Array.from(el.querySelectorAll('tbody tr')).map(tr =>
+              Array.from(tr.querySelectorAll('td')).map(td => td.textContent || '')
+            );
+            newBlocks.push({
+              id,
+              type: 'table',
+              table: {
+                cols: headers,
+                rows: rows,
+                colWidths: {},
+                boldCells: []
+              }
+            });
+          }
+        }
+
+        if (newBlocks.length > 0) {
+          setBlocks(newBlocks);
+          setSelected(null);
+        }
+      } catch (error) {
+        console.error('Error importing HTML:', error);
+        alert('Error importing file. Please check the file format.');
+      }
+    };
+
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  }
+
 
   function handleOnDragEnd(result) {
     if (!result.destination) return;
@@ -151,6 +399,25 @@ ${body}
             <label style={{fontSize:13}}>Theme</label>
             <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎨</button>
             <button onClick={() => setUseThemeColor(s => !s)} title={useThemeColor ? "Use Black Headings" : "Use Theme Color Headings"} style={{width:'40px', height:'40px', border:'2px solid ' + (useThemeColor ? theme : '#333'), borderRadius:'50%', background: useThemeColor ? theme : 'white', color: useThemeColor ? 'white' : 'black', cursor:'pointer', fontSize:'18px', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>H</button>
+            {showBoldButton && (
+              <button onMouseDown={handleGlobalBold} title="Bold Text (Ctrl+B)" style={{
+                width:'40px',
+                height:'40px',
+                border: isBoldActive ? '2px solid #333' : '2px solid #666',
+                borderRadius:'50%',
+                background: isBoldActive ? '#333' : 'white',
+                color: isBoldActive ? 'white' : '#333',
+                cursor:'pointer',
+                fontSize:'18px',
+                fontWeight:'bold',
+                display:'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                animation:'fadeIn 0.2s ease',
+                transition: 'all 0.2s ease'
+              }}>B</button>
+            )}
             {showColorPicker && (
               <div style={{ position: 'absolute', zIndex: 1000, top: '50px', left: '-10px' }}>
                 <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, left: 0 }} onClick={() => setShowColorPicker(false)} />
@@ -164,9 +431,15 @@ ${body}
             <button onClick={()=>addBlock('table')} title="Add Table" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📊</button>
             <button onClick={()=>addBlock('stat-grid')} title="Add Stat Grid" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📈</button>
             <button onClick={()=>addBlock('fact')} title="Add Fact Box" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>💡</button>
+            <button onClick={()=>addBlock('card')} title="Add Card" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎴</button>
             <button onClick={()=>addBlock('timeline')} title="Add Timeline" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>⏰</button>
             <button onClick={()=>addBlock('citation')} title="Add Citation" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📚</button>
+            <button onClick={()=>addBlock('hr')} title="Add Horizontal Line" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➖</button>
             <button onClick={clearAll} title="Clear All Content" style={{width:'40px', height:'40px', border:'2px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
+            <label style={{background:'white', color:'#333', border:'2px solid #666', borderRadius:'25px', padding:'12px 24px', cursor:'pointer', fontSize:'14px', fontWeight:'600', fontFamily:'Helvetica', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>
+              📥 Import HTML
+              <input type="file" accept=".html" onChange={importHtml} style={{display:'none'}} />
+            </label>
             <button onClick={exportHtml} style={{background:'white', color:'#333', border:'2px solid #666', borderRadius:'25px', padding:'12px 24px', cursor:'pointer', fontSize:'14px', fontWeight:'600', fontFamily:'Helvetica', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>📤 Export HTML</button>
           </div>
         </div>
@@ -215,7 +488,6 @@ ${body}
 // --- Block Editor ---
 function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   const ref = useRef();
-  const textareaRef = useRef(null); // <-- ADD THIS LINE
   const [editingHeader, setEditingHeader] = useState(null);
   const [resizing, setResizing] = useState(null);
   const [boldCells, setBoldCells] = useState(() => {
@@ -242,7 +514,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   const colWidths = useMemo(() => block.table?.colWidths || {}, [block.table?.colWidths]);
 
   useEffect(()=>{
-    if(selected && ['fact','citation'].includes(block.type) && ref.current){
+    if(selected && ['fact','citation','card','p'].includes(block.type) && ref.current){
       ref.current.innerHTML = block.html || '';
       // Force LTR direction with JavaScript
       ref.current.style.direction = 'ltr';
@@ -332,20 +604,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     });
   });
 
-    // Auto-resize textarea for paragraphs
-  useEffect(() => {
-    if (selected && block.type === 'p' && textareaRef.current) {
-      const textarea = textareaRef.current;
-      // Temporarily reset height to get the correct scrollHeight
-      textarea.style.height = 'auto';
-      // Set the height to match the content's full height
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, [block.html, selected, block.type]); // Rerun when text changes or block is selected
 
   function onInput(){
     const html = ref.current?.innerHTML || '';
-    // Force LTR on every input for contentEditable elements (fact, citation)
+    // Force LTR on every input for contentEditable elements (fact, citation, card)
     if (ref.current) {
       ref.current.style.direction = 'ltr';
       ref.current.style.textAlign = 'left';
@@ -355,6 +617,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     onChange({ html });
   }
 
+
   // Table helpers
   function addRow(){ const rows = [...(block.table.rows||[])]; const cols = block.table.cols||[]; rows.push(cols.map(()=>"")); onChange({ table: {...block.table, rows }});}
   function addCol(){
@@ -363,7 +626,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     const rows = block.table.rows.map(r=>[...r,'']);
     onChange({ table: {...block.table, cols, rows }});
   }
-  function updateCell(r,c,val){ const rows = block.table.rows.map((row,ri)=> ri===r ? row.map((cell,ci)=> ci===c? val : cell) : row ); onChange({ table: {...block.table, rows }});}
+  function updateCell(r,c,val){
+    const rows = block.table.rows.map((row,ri)=> ri===r ? row.map((cell,ci)=> ci===c? val : cell) : row );
+    onChange({ table: {...block.table, rows }});
+  }
   function updateHeader(i,val){ const cols = block.table.cols.map((h,hi)=> hi===i? val:h); onChange({ table: {...block.table, cols }});}
   function removeRow(i){ const rows = block.table.rows.filter((_,ri)=>ri!==i); onChange({ table: {...block.table, rows }});}
   function removeCol(i){ const cols = block.table.cols.filter((_,ci)=>ci!==i); const rows = block.table.rows.map(r=>r.filter((_,ci)=>ci!==i)); onChange({ table: {...block.table, cols, rows }});}
@@ -465,16 +731,51 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
   return (
     <div style={{marginBottom:12, position:'relative'}}>
-      <div style={{position:'absolute', right:6, top:6, display:'flex', gap:6}}>
+      <div style={{position:'absolute', right:6, top:6, display:'flex', gap:6, zIndex: 10}}>
         <button onClick={e=>{e.stopPropagation(); onRemove();}} title="Delete Block" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
       </div>
 
       {block.type==='h1' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='h2' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='h3' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
-      {block.type==='p' && <textarea ref={textareaRef} value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left', resize:'none', minHeight:'20px'}} />}
+      {block.type==='p' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px', whiteSpace:'pre-wrap'}} dir="ltr"></div>}
       {block.type==='fact' && <div className={selected ? "fact fact-editing" : "fact"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
+      {block.type==='card' && <div className="card" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
       {block.type==='citation' && <div className="citation" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
+      {block.type==='hr' && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect();
+          }}
+          style={{
+            position: 'relative',
+            padding: '10px 0',
+            cursor: 'pointer',
+            outline: selected ? '2px solid #007bff' : 'none',
+            borderRadius: '4px'
+          }}
+        >
+          <hr className="divider" style={{margin: '10px 0'}} />
+          {selected && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'rgba(255,255,255,0.9)',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              padding: '4px 8px',
+              fontSize: '12px',
+              color: '#666',
+              pointerEvents: 'none'
+            }}>
+              Horizontal Divider
+            </div>
+          )}
+        </div>
+      )}
 
       {block.type==='stat-grid' && (
         <div className={selected ? "stat-grid stat-grid-editing" : "stat-grid"}>
@@ -499,17 +800,23 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   element.setAttribute('dir', 'ltr');
                   element.style.direction = 'ltr';
 
-                  const range = document.createRange();
-                  const sel = window.getSelection();
+                  try {
+                    const range = document.createRange();
+                    const sel = window.getSelection();
 
-                  if (element.childNodes.length > 0) {
-                    range.setStart(element.childNodes[0], element.textContent.length);
-                  } else {
-                    range.setStart(element, 0);
+                    if (element.childNodes.length > 0 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+                      range.setStart(element.childNodes[0], Math.min(element.textContent.length, element.childNodes[0].textContent.length));
+                    } else if (element.childNodes.length > 0) {
+                      range.setStart(element, element.childNodes.length);
+                    } else {
+                      range.setStart(element, 0);
+                    }
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                  } catch (e) {
+                    console.warn('Could not restore cursor position:', e);
                   }
-                  range.collapse(true);
-                  sel.removeAllRanges();
-                  sel.addRange(range);
 
                   console.log('📊 Stat box cursor restored to end');
                 });
@@ -533,17 +840,23 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   element.setAttribute('dir', 'ltr');
                   element.style.direction = 'ltr';
 
-                  const range = document.createRange();
-                  const sel = window.getSelection();
+                  try {
+                    const range = document.createRange();
+                    const sel = window.getSelection();
 
-                  if (element.childNodes.length > 0) {
-                    range.setStart(element.childNodes[0], element.textContent.length);
-                  } else {
-                    range.setStart(element, 0);
+                    if (element.childNodes.length > 0 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+                      range.setStart(element.childNodes[0], Math.min(element.textContent.length, element.childNodes[0].textContent.length));
+                    } else if (element.childNodes.length > 0) {
+                      range.setStart(element, element.childNodes.length);
+                    } else {
+                      range.setStart(element, 0);
+                    }
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                  } catch (e) {
+                    console.warn('Could not restore cursor position:', e);
                   }
-                  range.collapse(true);
-                  sel.removeAllRanges();
-                  sel.addRange(range);
 
                   console.log('📊 Stat box subtitle cursor restored to end');
                 });
@@ -637,19 +950,29 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                             element.setAttribute('dir', 'ltr');
                             element.style.direction = 'ltr';
 
-                            const range = document.createRange();
-                            const sel = window.getSelection();
+                            try {
+                              const range = document.createRange();
+                              const sel = window.getSelection();
 
-                            if (element.childNodes.length > 0) {
-                              // Use textContent.length to place cursor at the very end
-                              range.setStart(element.childNodes[0], element.textContent.length);
-                            } else {
-                              range.setStart(element, 0);
+                              if (element.childNodes.length > 0) {
+                                const lastChild = element.childNodes[element.childNodes.length - 1];
+                                if (lastChild.nodeType === Node.TEXT_NODE) {
+                                  range.setStart(lastChild, Math.min(lastChild.textContent.length, lastChild.textContent.length));
+                                } else {
+                                  range.setStart(element, element.childNodes.length);
+                                }
+                              } else {
+                                range.setStart(element, 0);
+                              }
+
+                              range.collapse(true);
+                              sel.removeAllRanges();
+                              sel.addRange(range);
+                            } catch (e) {
+                              console.warn('Could not restore cursor position in header:', e);
+                              // Fallback: just focus the element
+                              element.focus();
                             }
-
-                            range.collapse(true);
-                            sel.removeAllRanges();
-                            sel.addRange(range);
                           });
                         }}
                         onBlur={() => setEditingHeader(null)}
@@ -749,19 +1072,20 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           // ROOT CAUSE FIX: Cursor position issue in React contentEditable
                           const element = e.target;
 
-                          // Save cursor position BEFORE getting text
+                          // Save cursor position BEFORE getting content
                           const selection = window.getSelection();
                           const cursorPos = selection.anchorOffset;
 
+                          let html = element.innerHTML || '';
                           let text = element.textContent || '';
 
-                          console.log('🔧 CURSOR FIX - Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
+                          console.log('🔧 CURSOR FIX - HTML:', JSON.stringify(html), 'Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
 
                           // Force proper cursor positioning
                           element.setAttribute('dir', 'ltr');
                           element.style.direction = 'ltr';
 
-                          updateCell(ri,ci,text);
+                          updateCell(ri,ci,html);
 
                           // CRITICAL: Restore cursor to the END of text after React update
                           requestAnimationFrame(() => {
@@ -769,17 +1093,28 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                             element.style.direction = 'ltr';
 
                             // Move cursor to end of text
-                            const range = document.createRange();
-                            const sel = window.getSelection();
+                            try {
+                              const range = document.createRange();
+                              const sel = window.getSelection();
 
-                            if (element.childNodes.length > 0) {
-                              range.setStart(element.childNodes[0], element.textContent.length);
-                            } else {
-                              range.setStart(element, 0);
+                              if (element.childNodes.length > 0) {
+                                const lastChild = element.childNodes[element.childNodes.length - 1];
+                                if (lastChild.nodeType === Node.TEXT_NODE) {
+                                  range.setStart(lastChild, lastChild.textContent.length);
+                                } else {
+                                  range.setStart(element, element.childNodes.length);
+                                }
+                              } else {
+                                range.setStart(element, 0);
+                              }
+                              range.collapse(true);
+                              sel.removeAllRanges();
+                              sel.addRange(range);
+                            } catch (e) {
+                              console.warn('Could not restore cursor position in table cell:', e);
+                              // Fallback: just focus the element
+                              element.focus();
                             }
-                            range.collapse(true);
-                            sel.removeAllRanges();
-                            sel.addRange(range);
 
                             console.log('🔧 Cursor restored to end of text');
                           });
@@ -815,9 +1150,8 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           textAlign: 'left',
                           unicodeBidi: 'normal'
                         }}
-                      >
-                        {c}
-                      </div>
+                        dangerouslySetInnerHTML={{ __html: c || '' }}
+                      ></div>
                     </td>
                   ))}
                   <td style={{
@@ -903,6 +1237,7 @@ h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align
 h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; white-space: pre-wrap; }
 .fact { border-left:6px solid ${theme}; padding:12px 16px; margin:10px 0; }
+.card { background:${theme}1a; border-radius:12px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:1px solid #dfe6ea; margin:10px 0; direction:ltr !important; text-align:left !important; }
 .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; direction:ltr !important; }
 .stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:${theme}27; direction:ltr !important; unicode-bidi:normal !important; }
 .stat .big { font-size:28px; color:${theme}; font-weight:800; line-height:1.1; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
@@ -1006,8 +1341,10 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
 .timeline-event { display:flex; gap:12px; margin-bottom:12px; font-family:Helvetica; }
 .timeline-event .year { font-weight:700; width:60px; color:${theme}; font-family:Helvetica; }
 .citation { font-size:14px; font-style:italic; color:#444; margin:8px 0; }
+.divider { border:none; height:4px; background:${useThemeColor ? theme : '#000000'}; margin:20px 0; width:100%; }
 button:hover { opacity: 0.8; transform: translateY(-1px); transition: all 0.2s ease; }
 button:active { transform: translateY(0); }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 [contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
 h1[contenteditable], h2[contenteditable], h3[contenteditable], p[contenteditable], div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
 .a4 [contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }

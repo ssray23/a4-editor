@@ -41,15 +41,16 @@ table td, table th {
 /* END NUCLEAR RTL OVERRIDE */
 
 .a4 { width:21cm; max-width:95%; min-height:29.7cm; padding:0.6cm; background:white; margin:10px auto; font-family:Helvetica; font-size:16px; line-height:1.6; direction:ltr !important; text-align:left !important; }
-h1 { font-size:38px; font-weight:bold; margin-top:0; margin-bottom:20px; line-height:1.3; direction:ltr; text-align:left; color:#1f385f; }
-h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align:left; color:#1f385f; }
-h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; color:#1f385f; }
-p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; }
-.fact { border-left:6px solid #1f385f; padding:12px 16px; margin:10px 0; }
+h1 { font-size:38px; font-weight:bold; margin-top:0; margin-bottom:20px; line-height:1.3; direction:ltr; text-align:left; color:#d0021b; }
+h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align:left; color:#d0021b; }
+h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; color:#d0021b; }
+p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; white-space: pre-wrap; }
+.fact { border-left:6px solid #d0021b; padding:12px 16px; margin:10px 0; }
+.card { background:#d0021b1a; border-radius:12px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:1px solid #dfe6ea; margin:10px 0; direction:ltr !important; text-align:left !important; }
 .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; direction:ltr !important; }
-.stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:#1f385f27; direction:ltr !important; unicode-bidi:normal !important; }
-.stat .big { font-size:28px; color:#1f385f; font-weight:800; line-height:1.1; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
-.stat .sub { font-size:14px; color:#1f385f; line-height:1.3; margin:10px 0; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:#d0021b27; direction:ltr !important; unicode-bidi:normal !important; }
+.stat .big { font-size:28px; color:#d0021b; font-weight:800; line-height:1.1; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
+.stat .sub { font-size:14px; color:#d0021b; line-height:1.3; margin:10px 0; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
 .stat * { direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
 .a4 table.editing-table,
 .a4 table.editing-table * {
@@ -57,6 +58,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   border-spacing: 0 !important;
 }
 .a4 table.editing-table {
+  table-layout: fixed !important; /* <--- ADD THIS LINE */
   width: 100% !important;
   margin: 10px 0 20px 0 !important;
   border: 1.5px solid #000000 !important;
@@ -66,7 +68,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   font-family: Helvetica !important;
 }
 .a4 table.editing-table thead tr {
-  background: #1f385f !important;
+  background: #d0021b !important;
   color: #fff !important;
   line-height: 1.4 !important;
 }
@@ -76,6 +78,8 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   font-weight: 700 !important;
   border-right: 1.5px solid #000000 !important;
   font-family: Helvetica !important;
+  direction: ltr !important;
+  box-sizing: border-box !important; /* <-- ADD THIS LINE */
 }
 .a4 table.editing-table thead th:last-child {
   border-right: none !important;
@@ -85,6 +89,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   border-top: 1.5px solid rgb(0, 0, 0) !important;
   border-right: 1.5px solid #000 !important;
   font-family: Helvetica !important;
+  box-sizing: border-box !important; /* <-- ADD THIS LINE */
 }
 .a4 table.editing-table tbody td:last-child {
   border-right: none !important;
@@ -141,12 +146,14 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   text-align: left !important;
   unicode-bidi: normal !important;
 }
-.timeline { border-left:3px solid #1f385f; margin:12px 0; padding-left:16px; font-family:Helvetica; }
+.timeline { border-left:3px solid #d0021b; margin:12px 0; padding-left:16px; font-family:Helvetica; }
 .timeline-event { display:flex; gap:12px; margin-bottom:12px; font-family:Helvetica; }
-.timeline-event .year { font-weight:700; width:60px; color:#1f385f; font-family:Helvetica; }
+.timeline-event .year { font-weight:700; width:60px; color:#d0021b; font-family:Helvetica; }
 .citation { font-size:14px; font-style:italic; color:#444; margin:8px 0; }
+.divider { border:none; height:4px; background:#d0021b; margin:20px 0; width:100%; }
 button:hover { opacity: 0.8; transform: translateY(-1px); transition: all 0.2s ease; }
 button:active { transform: translateY(0); }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 [contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
 h1[contenteditable], h2[contenteditable], h3[contenteditable], p[contenteditable], div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
 .a4 [contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
@@ -158,9 +165,9 @@ table td, table th { text-align: left !important; }
 .stat .big, .stat .sub { text-align: center !important; }
 
 /* Word-like borderless editing */
-.fact-editing { border-left: 3px solid #1f385f; background: rgba(255,255,255,0.8); }
+.fact-editing { border-left: 3px solid #d0021b; background: rgba(255,255,255,0.8); }
 .stat-grid-editing .stat { border: 1px dashed #ccc; background: rgba(255,255,255,0.9); }
-.timeline-editing { border-left: 2px dashed #1f385f; background: rgba(255,255,255,0.8); }
+.timeline-editing { border-left: 2px dashed #d0021b; background: rgba(255,255,255,0.8); }
 
 /* Rendered table styling to match A4.css */
 .rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }
@@ -171,7 +178,15 @@ table td, table th { text-align: left !important; }
 <body>
 <div class="a4">
 <h1>Daily Updates</h1>
-<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;"><thead><tr style="background:#1f385f; color:#fff; line-height:1.4;"><th style="width:278px; padding:8px 10px; text-align:left; font-weight:700; border-right:1.5px solid #000000; font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 1</th><th style="padding:8px 10px; text-align:left; font-weight:700; border-right:1.5px solid #000000; font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 2</th><th style="padding:8px 10px; text-align:left; font-weight:700;  font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 3</th></tr></thead><tbody><tr style="background:#ffffff"><td style="width:278px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">tset gfgfggWooden slats to be affixed on the bed frame securely..Ealing, London, W5 5Q, Englandi need wooden slats to be affixed on the bed frame securely.. they have come off at many places&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">test</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">Cell 3</td></tr><tr style="background:#f6f6f6"><td style="width:278px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td></tr><tr style="background:#ffffff"><td style="width:278px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td><td style="padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">&nbsp;</td></tr></tbody></table>
+<div class="stat-grid"><div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">123</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">Metric 1</div></div><div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">456</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">Metric 2</div></div><div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">789</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">Metric 3</div></div></div>
+<div class="card"><strong>This is a bolded header</strong><br><br>This is <b>some</b> regular text that follows the <b>header</b>. You can <b>select </b>any text and use the bold button or Ctrl+B to format it. This card demonstrates how you can mix bold and <b>regular </b>text within the same element.</div>
+<p><b>Start </b>typing your <b>paragraph</b>...Based in New York and London, Commercial Type is a joint venture between Paul Barnes and Christian Schwartz, who have collaborated since 2004 on various typeface projects, most notably the award winning Guardian Egyptian. The company publishes retail fonts developed by Barnes and Schwartz, their staff, and outside collaborators, and also represents the two and their team when they work together on type design projects.
+
+Following the redesign of The <b>Guardian</b>, the team headed by Mark Porter, including Barnes and Schwartz, was awarded the coveted Black Pencil by the D&amp;AD. The team was also nominated for the Design Museum’s “Designer of the Year” prize. In September 2006, Barnes <b>and</b> Schwartz were <b>named two of the 40 most influential designers under 40 in Wallpaper*.</b></p>
+<hr class="divider">
+<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;"><thead><tr style="background:#d0021b; color:#fff; line-height:1.4;"><th style="width:133px; padding:8px 10px; text-align:left; font-weight:700; border-right:1.5px solid #000000; font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 1</th><th style="width:552px; padding:8px 10px; text-align:left; font-weight:700;  font-family:Helvetica; direction:ltr; unicode-bidi:normal;">Header 2</th></tr></thead><tbody><tr style="background:#ffffff"><td style="width:133px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">Cell 1</td><td style="width:552px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">Cell 2</td></tr><tr style="background:#f6f6f6"><td style="width:133px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">Cell 4</td><td style="width:552px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; "><b>Cell</b> 5</td></tr><tr style="background:#ffffff"><td style="width:133px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0); border-right:1.5px solid #000; font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; font-weight:bold;">Controls</td><td style="width:552px; padding:8px 10px; border-top:1.5px solid rgb(0,0,0);  font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ">Cell 8</td></tr></tbody></table>
+<div class="card"><strong>This is a bolded header</strong><br><br>This is some regular text that follows the header. You can select any text and use the bold button or Ctrl+B to format it. This card demonstrates how you can mix bold and regular text within the same element.</div>
+<hr class="divider">
 </div>
 
 </body></html>
