@@ -376,19 +376,55 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   }
 
   // Column resize helpers
-  function handleResizeStart(colIndex, e) {
+    function handleResizeStart(colIndex, e) {
     e.preventDefault();
     e.stopPropagation();
-    const currentWidth = colWidths[colIndex] || e.target.parentElement.offsetWidth;
-    setResizing({ colIndex, startX: e.clientX, startWidth: currentWidth });
+
+    // Get the header cell element and its next sibling
+    const th = e.target.parentElement;
+    const nextTh = th.nextElementSibling;
+
+    // We can only do this if there is a next column to adjust
+    if (!nextTh || !nextTh.tagName === 'TH') {
+      return; 
+    }
+
+    setResizing({
+      colIndex,
+      startX: e.clientX,
+      startWidth: th.offsetWidth,
+      startWidthNext: nextTh.offsetWidth, // <-- Store the next column's width
+    });
   }
 
   useEffect(() => {
     function handleMouseMove(e) {
       if (resizing) {
         const deltaX = e.clientX - resizing.startX;
-        const newWidth = Math.max(80, resizing.startWidth + deltaX);
-        const newColWidths = { ...colWidths, [resizing.colIndex]: newWidth };
+        const minWidth = 80; // Minimum width for a column
+        const combinedWidth = resizing.startWidth + resizing.startWidthNext;
+
+        // Calculate new widths for the two columns
+        let newWidth = resizing.startWidth + deltaX;
+        let newWidthNext = resizing.startWidthNext - deltaX;
+
+        // Enforce minimum width, adjusting the other column to maintain total width
+        if (newWidth < minWidth) {
+          newWidth = minWidth;
+          newWidthNext = combinedWidth - newWidth;
+        }
+        
+        if (newWidthNext < minWidth) {
+          newWidthNext = minWidth;
+          newWidth = combinedWidth - newWidthNext;
+        }
+
+        const newColWidths = {
+          ...colWidths,
+          [resizing.colIndex]: newWidth,
+          [resizing.colIndex + 1]: newWidthNext, // Update the adjacent column
+        };
+        
         onChange({ table: { ...block.table, colWidths: newColWidths } });
       }
     }
@@ -866,6 +902,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   border-spacing: 0 !important;
 }
 .a4 table.editing-table {
+  table-layout: fixed !important; /* <--- ADD THIS LINE */
   width: 100% !important;
   margin: 10px 0 20px 0 !important;
   border: 1.5px solid #000000 !important;
@@ -886,6 +923,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   border-right: 1.5px solid #000000 !important;
   font-family: Helvetica !important;
   direction: ltr !important;
+  box-sizing: border-box !important; /* <-- ADD THIS LINE */
 }
 .a4 table.editing-table thead th:last-child {
   border-right: none !important;
@@ -895,6 +933,7 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   border-top: 1.5px solid rgb(0, 0, 0) !important;
   border-right: 1.5px solid #000 !important;
   font-family: Helvetica !important;
+  box-sizing: border-box !important; /* <-- ADD THIS LINE */
 }
 .a4 table.editing-table tbody td:last-child {
   border-right: none !important;
