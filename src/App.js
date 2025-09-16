@@ -571,7 +571,39 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         contentEditable
                         suppressContentEditableWarning
                         dir="ltr"
-                        onInput={e=>updateHeader(hi,e.target.textContent)}
+                        // onInput={e=>updateHeader(hi,e.target.textContent)}
+                        onInput={e => {
+                          // MIRRORING THE FIX FROM TABLE CELLS
+                          const element = e.currentTarget;
+                          let text = element.textContent || '';
+
+                          // Force proper LTR direction on input
+                          element.setAttribute('dir', 'ltr');
+                          element.style.direction = 'ltr';
+
+                          // Update the header state
+                          updateHeader(hi, text);
+
+                          // CRITICAL: Restore cursor to the END of text after React re-renders
+                          requestAnimationFrame(() => {
+                            element.setAttribute('dir', 'ltr');
+                            element.style.direction = 'ltr';
+
+                            const range = document.createRange();
+                            const sel = window.getSelection();
+
+                            if (element.childNodes.length > 0) {
+                              // Use textContent.length to place cursor at the very end
+                              range.setStart(element.childNodes[0], element.textContent.length);
+                            } else {
+                              range.setStart(element, 0);
+                            }
+
+                            range.collapse(true);
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                          });
+                        }}
                         onBlur={() => setEditingHeader(null)}
                         onKeyDown={e => e.key === 'Enter' && setEditingHeader(null)}
                         style={{
