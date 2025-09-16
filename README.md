@@ -176,6 +176,18 @@ npm start
 npm run build
 ```
 
+### Deploy to Render
+This project is configured for easy deployment to [Render](https://render.com):
+
+1. **Connect Repository** - Link your GitHub repository to Render
+2. **Auto-Deploy** - The `render.yaml` file automatically configures:
+   - Build command: `npm install && npm run build`
+   - Static site serving from `./build` directory
+   - SPA routing with fallback to `index.html`
+3. **Environment** - No environment variables required for basic deployment
+
+The app will be available at your Render URL once deployed.
+
 ## 📝 Current Status
 
 ### ✅ Completed Features
