@@ -889,7 +889,7 @@ table td, table th {
 h1 { font-size:38px; font-weight:bold; margin-top:0; margin-bottom:20px; line-height:1.3; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
-p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; }
+p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; white-space: pre-wrap; }
 .fact { border-left:6px solid ${theme}; padding:12px 16px; margin:10px 0; }
 .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; direction:ltr !important; }
 .stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:${theme}27; direction:ltr !important; unicode-bidi:normal !important; }
