@@ -215,6 +215,7 @@ ${body}
 // --- Block Editor ---
 function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   const ref = useRef();
+  const textareaRef = useRef(null); // <-- ADD THIS LINE
   const [editingHeader, setEditingHeader] = useState(null);
   const [resizing, setResizing] = useState(null);
   const [boldCells, setBoldCells] = useState(() => {
@@ -330,6 +331,17 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       }
     });
   });
+
+    // Auto-resize textarea for paragraphs
+  useEffect(() => {
+    if (selected && block.type === 'p' && textareaRef.current) {
+      const textarea = textareaRef.current;
+      // Temporarily reset height to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set the height to match the content's full height
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [block.html, selected, block.type]); // Rerun when text changes or block is selected
 
   function onInput(){
     const html = ref.current?.innerHTML || '';
@@ -460,7 +472,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       {block.type==='h1' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='h2' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
       {block.type==='h3' && <input value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left'}} />}
-      {block.type==='p' && <textarea value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left', resize:'none', minHeight:'20px'}} />}
+      {block.type==='p' && <textarea ref={textareaRef} value={block.html || ''} onChange={e => onChange({html: e.target.value})} style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr', textAlign:'left', resize:'none', minHeight:'20px'}} />}
       {block.type==='fact' && <div className={selected ? "fact fact-editing" : "fact"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
       {block.type==='citation' && <div className="citation" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
 
