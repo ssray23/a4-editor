@@ -282,6 +282,61 @@ npm run build
 - **No Environment Variables** - No configuration required
 - **CDN Ready** - Optimized for content delivery networks
 
+## 📋 Recent Updates & Bug Fixes
+
+### v2.2.0 - Text Direction and WYSIWYG Improvements (September 2025)
+
+#### 🔧 Major Bug Fixes
+- **Fixed Timeline RTL Text Issue** - Resolved persistent right-to-left text display in timeline elements showing reversed text like "1 tneve" instead of "Event 1"
+- **Text Selection Restoration** - Fixed broken text selection in table cells where users couldn't select individual words or use double-click selection
+- **Cursor Jump Prevention** - Eliminated cursor jumping to start of text blocks when typing in paragraphs, cards, and other contentEditable elements
+
+#### ⚡ WYSIWYG Enhancements
+- **Seamless Stat Card Editing** - Removed white background overlays and borders during editing while preserving original card styling
+- **Timeline Visual Continuity** - Converted timeline from input fields to contentEditable divs maintaining visual consistency during editing
+- **Fact Card Boundary Removal** - Eliminated editing boundaries for cleaner WYSIWYG experience across all card types
+
+#### 🎯 Toolbar Improvements
+- **Enhanced Bullet Lists** - Implemented inline bullet list formatting within paragraphs and cards (similar to Microsoft Word) rather than standalone blocks
+- **Visual Button Labels** - Added text labels below all toolbar buttons for improved user experience and accessibility
+- **Smart List Detection** - Bullet list button now appears only when editing compatible content types (paragraphs, cards, facts, citations)
+
+#### 🔨 Technical Improvements
+- **Consistent Content Management** - Standardized all contentEditable elements to use `innerHTML` for uniform text handling
+- **Simplified Input Handlers** - Streamlined onInput functions removing complex cursor restoration logic that caused interference
+- **Universal LTR Direction** - Applied comprehensive left-to-right text direction enforcement across all elements
+- **Ref-Based Content Sync** - Eliminated `dangerouslySetInnerHTML` usage in favor of ref-based content management for better DOM control
+
+#### 🎨 Visual Polish
+- **Preserved Card Aesthetics** - Maintained original card fill colors, strokes, and visual styling during text editing
+- **Cleaner Edit States** - Removed unnecessary visual boundaries and backgrounds that appeared during editing
+- **Consistent Typography** - Ensured all text elements maintain proper font family and sizing throughout editing states
+
+#### 🛠️ Architecture Enhancements
+- **Unified Text Processing** - All text elements now follow the same content management pattern for consistency
+- **Minimal DOM Manipulation** - Reduced aggressive CSS property setting in favor of browser-native text handling
+- **Performance Optimization** - Simplified event handlers and reduced unnecessary re-renders during text editing
+
+### Implementation Details
+
+#### Timeline RTL Fix
+The timeline RTL text issue was resolved by:
+1. **Pattern Alignment** - Changed timeline elements to use the same `innerHTML` content management as working elements (paragraphs, cards)
+2. **Simplified Handlers** - Replaced complex CSS property manipulation with minimal onInput handlers
+3. **Content Consistency** - Ensured timeline follows the exact same pattern as other successfully working contentEditable elements
+
+#### Text Selection Restoration
+Table cell text selection was fixed by:
+1. **DOM Interference Removal** - Eliminated `dangerouslySetInnerHTML` usage that was destroying browser selection ranges
+2. **Ref-Based Management** - Implemented proper content synchronization through refs instead of JSX interpolation
+3. **Native Selection Support** - Allowed browser's native text selection mechanisms to function properly
+
+#### WYSIWYG Visual Improvements
+Enhanced editing experience through:
+1. **Background Removal** - Eliminated white backgrounds and editing overlays that disrupted visual continuity
+2. **Border Elimination** - Removed temporary editing boundaries while maintaining focus indicators
+3. **Style Preservation** - Kept original element styling (colors, fills, strokes) during editing states
+
 ## 🔥 Latest Features (Perfect Import/Export)
 
 ### 100% Format Fidelity

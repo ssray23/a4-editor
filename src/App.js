@@ -718,6 +718,24 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     }
   }, [block.stats, selected, block.type]);
 
+  // Update timeline content when block data changes
+  useEffect(() => {
+    if (block.type === 'timeline' && selected && block.events) {
+      block.events.forEach((event, idx) => {
+        // Update timeline event elements
+        const eventElements = document.querySelectorAll(`[data-event-idx="${idx}"]`);
+        eventElements.forEach(el => {
+          if (el.classList.contains('year') && el.textContent !== event.year) {
+            el.textContent = event.year;
+          }
+          if (el.classList.contains('desc') && el.textContent !== event.desc) {
+            el.textContent = event.desc;
+          }
+        });
+      });
+    }
+  }, [block.events, selected, block.type]);
+
   // Close header editing when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -1235,9 +1253,45 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       {block.type==='timeline' && (
         <div className={selected ? "timeline timeline-editing" : "timeline"}>
           {(block.events||[]).map((ev,idx)=>(
-            <div className="timeline-event" key={idx} style={{display:'flex',gap:12,marginBottom:8}}>
-              <input value={ev.year} onChange={e=>updateEvent(idx,'year',e.target.value)} style={{width:80, fontFamily:'Helvetica', border:'none', background:'transparent', outline:'none', padding:'4px', fontSize:'16px'}} />
-              <input value={ev.desc} onChange={e=>updateEvent(idx,'desc',e.target.value)} style={{flex:1, fontFamily:'Helvetica', border:'none', background:'transparent', outline:'none', padding:'4px', fontSize:'16px'}} />
+            <div className="timeline-event" key={idx} style={{display:'flex',gap:12,marginBottom:12}}>
+              <div className="year"
+                contentEditable
+                suppressContentEditableWarning
+                ref={el => {
+                  if (el) {
+                    // Use innerHTML like working elements
+                    if (el.innerHTML !== ev.year) {
+                      el.innerHTML = ev.year;
+                    }
+                  }
+                }}
+                onInput={e=>{
+                  const element = e.currentTarget;
+                  // Use innerHTML like working elements
+                  const html = element.innerHTML || '';
+                  updateEvent(idx, 'year', html);
+                }}
+                style={{width:'60px', fontFamily:'Helvetica', fontWeight:'700', color: theme, fontSize:'16px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}}
+                dir="ltr"></div>
+              <div className="desc"
+                contentEditable
+                suppressContentEditableWarning
+                ref={el => {
+                  if (el) {
+                    // Use innerHTML like working elements
+                    if (el.innerHTML !== ev.desc) {
+                      el.innerHTML = ev.desc;
+                    }
+                  }
+                }}
+                onInput={e=>{
+                  const element = e.currentTarget;
+                  // Use innerHTML like working elements
+                  const html = element.innerHTML || '';
+                  updateEvent(idx, 'desc', html);
+                }}
+                style={{flex:1, fontFamily:'Helvetica', fontSize:'16px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}}
+                dir="ltr"></div>
             </div>
           ))}
         </div>
@@ -1403,11 +1457,17 @@ table td, table th { text-align: left !important; }
 .stat .big, .stat .sub { text-align: center !important; }
 
 /* Word-like borderless editing */
-.fact-editing { border-left: 3px solid ${theme}; background: rgba(255,255,255,0.8); }
+.fact-editing { border-left: 6px solid ${theme}; outline: none !important; }
+.fact-editing:focus { outline: none !important; border: none !important; }
+.fact-editing * { outline: none !important; }
 .stat-grid-editing .stat { border: 1.5px solid #000; background: ${theme}27; }
 .stat-grid-editing .stat .big:hover, .stat-grid-editing .stat .sub:hover { outline: none; border: none; }
 .stat-grid-editing .stat .big:focus, .stat-grid-editing .stat .sub:focus { outline: none !important; border: none !important; }
-.timeline-editing { border-left: 2px dashed ${theme}; background: rgba(255,255,255,0.8); }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
+.timeline-editing { border-left: 3px solid ${theme}; }
+.timeline-editing .year:hover, .timeline-editing .desc:hover { outline: none; border: none; }
+.timeline-editing .year:focus, .timeline-editing .desc:focus { outline: none !important; border: none !important; }
+.timeline-editing .year, .timeline-editing .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
+.timeline .year, .timeline .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
 }
 
