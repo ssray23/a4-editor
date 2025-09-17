@@ -700,6 +700,24 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     }
   }, [block.id, block.html, block.type, selected]);
 
+  // Update stat content when block data changes
+  useEffect(() => {
+    if (block.type === 'stat-grid' && selected && block.stats) {
+      block.stats.forEach((stat, idx) => {
+        // Update stat value elements
+        const statElements = document.querySelectorAll(`[data-stat-idx="${idx}"]`);
+        statElements.forEach(el => {
+          if (el.classList.contains('big') && el.textContent !== stat.value) {
+            el.textContent = stat.value;
+          }
+          if (el.classList.contains('sub') && el.textContent !== stat.title) {
+            el.textContent = stat.title;
+          }
+        });
+      });
+    }
+  }, [block.stats, selected, block.type]);
+
   // Close header editing when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -952,85 +970,19 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
         <div className={selected ? "stat-grid stat-grid-editing" : "stat-grid"}>
           {(block.stats||[]).map((s,idx)=> (
             <div className="stat" key={idx} style={{direction:'ltr'}}>
-              <div className="big" contentEditable suppressContentEditableWarning={true} onInput={e=>{
-                // CURSOR FIX for stat box
+              <div className="big" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx} onInput={e=>{
                 const element = e.currentTarget;
-                const selection = window.getSelection();
-                const cursorPos = selection.anchorOffset;
-                let text = element.textContent || '';
-
-                console.log('📊 STAT BOX CURSOR FIX - Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
-
-                element.setAttribute('dir', 'ltr');
-                element.style.direction = 'ltr';
-
-                const stats = [...(block.stats||[])]; stats[idx].value = text; onChange({ stats });
-
-                // Restore cursor to end of text
-                requestAnimationFrame(() => {
-                  element.setAttribute('dir', 'ltr');
-                  element.style.direction = 'ltr';
-
-                  try {
-                    const range = document.createRange();
-                    const sel = window.getSelection();
-
-                    if (element.childNodes.length > 0 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
-                      range.setStart(element.childNodes[0], Math.min(element.textContent.length, element.childNodes[0].textContent.length));
-                    } else if (element.childNodes.length > 0) {
-                      range.setStart(element, element.childNodes.length);
-                    } else {
-                      range.setStart(element, 0);
-                    }
-                    range.collapse(true);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                  } catch (e) {
-                    console.warn('Could not restore cursor position:', e);
-                  }
-
-                  console.log('📊 Stat box cursor restored to end');
-                });
+                const text = element.textContent || '';
+                const stats = [...(block.stats||[])];
+                stats[idx].value = text;
+                onChange({ stats });
               }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.value}</div>
-              <div className="sub" contentEditable suppressContentEditableWarning={true} onInput={e=>{
-                // CURSOR FIX for stat box subtitle
+              <div className="sub" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx} onInput={e=>{
                 const element = e.currentTarget;
-                const selection = window.getSelection();
-                const cursorPos = selection.anchorOffset;
-                let text = element.textContent || '';
-
-                console.log('📊 STAT BOX SUB CURSOR FIX - Text:', JSON.stringify(text), 'Cursor pos:', cursorPos);
-
-                element.setAttribute('dir', 'ltr');
-                element.style.direction = 'ltr';
-
-                const stats = [...(block.stats||[])]; stats[idx].title = text; onChange({ stats });
-
-                // Restore cursor to end of text
-                requestAnimationFrame(() => {
-                  element.setAttribute('dir', 'ltr');
-                  element.style.direction = 'ltr';
-
-                  try {
-                    const range = document.createRange();
-                    const sel = window.getSelection();
-
-                    if (element.childNodes.length > 0 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
-                      range.setStart(element.childNodes[0], Math.min(element.textContent.length, element.childNodes[0].textContent.length));
-                    } else if (element.childNodes.length > 0) {
-                      range.setStart(element, element.childNodes.length);
-                    } else {
-                      range.setStart(element, 0);
-                    }
-                    range.collapse(true);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                  } catch (e) {
-                    console.warn('Could not restore cursor position:', e);
-                  }
-
-                  console.log('📊 Stat box subtitle cursor restored to end');
-                });
+                const text = element.textContent || '';
+                const stats = [...(block.stats||[])];
+                stats[idx].title = text;
+                onChange({ stats });
               }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.title}</div>
             </div>
           ))}
@@ -1452,7 +1404,9 @@ table td, table th { text-align: left !important; }
 
 /* Word-like borderless editing */
 .fact-editing { border-left: 3px solid ${theme}; background: rgba(255,255,255,0.8); }
-.stat-grid-editing .stat { border: 1px dashed #ccc; background: rgba(255,255,255,0.9); }
+.stat-grid-editing .stat { border: 1.5px solid #000; background: ${theme}27; }
+.stat-grid-editing .stat .big:hover, .stat-grid-editing .stat .sub:hover { outline: none; border: none; }
+.stat-grid-editing .stat .big:focus, .stat-grid-editing .stat .sub:focus { outline: none !important; border: none !important; }
 .timeline-editing { border-left: 2px dashed ${theme}; background: rgba(255,255,255,0.8); }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
 }
