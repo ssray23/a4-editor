@@ -192,6 +192,86 @@ A stunning, modern WYSIWYG document editor that creates beautiful A4-formatted d
 - **react-color** - Professional color picker component
 - **CSS-in-JS** - Dynamic theme system with real-time updates
 
+### CSS Architecture
+The application uses a **dual CSS system** for optimal functionality:
+
+#### A4.css (Reference Stylesheet)
+- **Complete Document System** - Comprehensive styling with responsive design and print optimizations
+- **Media Queries** - Responsive breakpoints (`@media (max-width: 1600px)`) and print styles (`@media print`)
+- **Advanced Components** - Full styling for citations, figures, diagrams, code blocks, and utility classes
+- **Template Variables** - Uses `{theme_color}` placeholders for theme integration
+- **Print-Ready** - Optimized for PDF generation and professional document output
+
+#### JavaScript-Generated CSS (Dynamic Styles)
+- **Editor-Optimized** - Focused on editing experience and user interaction
+- **RTL Override System** - Comprehensive `direction: ltr !important` enforcement
+- **Dynamic Theming** - Real-time `${theme}` variable injection based on user selection
+- **Interactive States** - Button hover effects, animations, and editing-specific styling
+- **Editing Features** - ContentEditable optimizations, table editing states, and WYSIWYG enhancements
+
+#### Key Architectural Differences
+| Feature | A4.css | JavaScript CSS |
+|---------|--------|----------------|
+| **Purpose** | Document presentation | Editor functionality |
+| **Responsive** | ✅ Full breakpoints | ❌ Editor-focused only |
+| **Print Support** | ✅ Print optimizations | ❌ Not included |
+| **Components** | ✅ Citations, figures, diagrams | ❌ Core elements only |
+| **Theme System** | Static placeholders | ✅ Dynamic injection |
+| **RTL Handling** | Targeted fixes | ✅ Aggressive overrides |
+| **Editing States** | ❌ Not included | ✅ Comprehensive |
+
+#### Why This Approach?
+- **Separation of Concerns** - Document presentation vs. editing functionality
+- **Performance** - Dynamic CSS only loads editing-specific styles
+- **Maintainability** - Clear distinction between display and interaction styling
+- **Flexibility** - Can optimize each system for its specific use case
+
+#### CSS Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        A4 Editor Architecture                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┐    ┌─────────────────────────────────────┐
+│       A4.css        │    │        JavaScript CSS Engine        │
+│   (Reference)       │    │         (Runtime)                   │
+├─────────────────────┤    ├─────────────────────────────────────┤
+│ • Complete system   │    │ • getStyle() function              │
+│ • Responsive design │────│ • Dynamic ${theme} injection       │
+│ • Print styles      │    │ • RTL overrides                    │
+│ • Advanced comps    │    │ • Editing states                   │
+│ • Static templates  │    │ • Interactive features             │
+└─────────────────────┘    └─────────────────────────────────────┘
+           │                                  │
+           │                                  ▼
+           │                    ┌─────────────────────────────────┐
+           │                    │       Style Injection           │
+           │                    │   document.createElement()     │
+           │                    │   <style id="a4-style">        │
+           │                    └─────────────────────────────────┘
+           │                                  │
+           ▼                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      Browser DOM                                │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌────────────────┐   │
+│  │  Editor View    │  │  Export HTML    │  │  Print View    │   │
+│  │  ──────────     │  │  ──────────     │  │  ──────────    │   │
+│  │ JS CSS Active   │  │ JS CSS Embedded │  │ A4.css Rules   │   │
+│  │ RTL Overrides   │  │ Theme Injected  │  │ Media Queries  │   │
+│  │ Editing States  │  │ Self-contained  │  │ Optimizations  │   │
+│  └─────────────────┘  └─────────────────┘  └────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+
+Flow:
+1. A4.css defines complete document system (width: 21cm, etc.)
+2. JavaScript getStyle() generates editor-optimized CSS
+3. Runtime injects dynamic styles with theme colors
+4. Export embeds same JS CSS for standalone documents
+5. Print inherits A4.css responsive/print optimizations
+```
+
 ### Data Structure
 Documents stored as block arrays with this structure:
 ```javascript
