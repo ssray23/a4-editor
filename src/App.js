@@ -688,7 +688,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
   useEffect(()=>{
     if(selected && ['fact','citation','card','p','h1','h2','h3'].includes(block.type) && ref.current){
-      ref.current.innerHTML = block.html || '';
+      // Only set innerHTML if it's actually different to avoid cursor jumping
+      if (ref.current.innerHTML !== (block.html || '')) {
+        ref.current.innerHTML = block.html || '';
+      }
       // Force LTR direction with JavaScript
       ref.current.style.direction = 'ltr';
       ref.current.style.textAlign = 'left';
@@ -777,43 +780,14 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     });
   });
 
-  // --- START: SIMPLIFIED onInput FUNCTION ---
+  // --- START: MINIMAL onInput FUNCTION ---
   function onInput(e) {
     const element = e.currentTarget;
     const html = element.innerHTML || '';
-
-    // Only restore cursor position if React actually changes the DOM content
-    // Skip cursor restoration for natural typing, Enter key, and backspace
-    const currentHtml = element.innerHTML;
-
     onChange({ html });
-
-    // Only restore cursor if the DOM content would be different after React update
-    requestAnimationFrame(() => {
-      if (!document.contains(element)) return;
-
-      // If innerHTML hasn't changed, React didn't modify the DOM, so don't interfere with cursor
-      if (element.innerHTML === currentHtml) {
-        return;
-      }
-
-      // Otherwise, try to maintain cursor position (for cases where React did change the DOM)
-      try {
-        const selection = window.getSelection();
-        if (selection.rangeCount === 0) {
-          // If no selection, place cursor at end
-          const range = document.createRange();
-          range.selectNodeContents(element);
-          range.collapse(false);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-      } catch (err) {
-        console.warn('Failed to maintain cursor position:', err);
-      }
-    });
+    // No cursor restoration - let the browser handle cursor position naturally
   }
-  // --- END: SIMPLIFIED onInput FUNCTION ---
+  // --- END: MINIMAL onInput FUNCTION ---
 
   // Table helpers
   function addRow(){ const rows = [...(block.table.rows||[])]; const cols = block.table.cols||[]; rows.push(cols.map(()=>"")); onChange({ table: {...block.table, rows }});}
@@ -1131,60 +1105,9 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         dir="ltr"
                         // onInput={e=>updateHeader(hi,e.target.textContent)}
                         onInput={e => {
-                          // Use the same cursor preservation logic as other contentEditable elements
                           const element = e.currentTarget;
-
-                          // Save the current cursor position as a character offset
-                          const selection = window.getSelection();
-                          let caretOffset = 0;
-                          if (selection.rangeCount > 0) {
-                            const range = selection.getRangeAt(0);
-                            const preCaretRange = range.cloneRange();
-                            preCaretRange.selectNodeContents(element);
-                            preCaretRange.setEnd(range.startContainer, range.startOffset);
-                            caretOffset = preCaretRange.toString().length;
-                          }
-
                           const text = element.textContent || '';
                           updateHeader(hi, text);
-
-                          // Restore the cursor position after React's re-render has completed
-                          requestAnimationFrame(() => {
-                            if (!document.contains(element)) return; // Exit if element is no longer in the DOM
-
-                            try {
-                              const range = document.createRange();
-                              const sel = window.getSelection();
-
-                              // Use a TreeWalker to find the correct text node and offset
-                              const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-                              let charCount = 0;
-                              let found = false;
-
-                              while (walker.nextNode()) {
-                                const node = walker.currentNode;
-                                const nodeLength = node.textContent.length;
-                                if (charCount + nodeLength >= caretOffset) {
-                                  range.setStart(node, caretOffset - charCount);
-                                  range.collapse(true);
-                                  found = true;
-                                  break;
-                                }
-                                charCount += nodeLength;
-                              }
-
-                              // If not found (e.g., empty element or at the very end), place cursor at the end
-                              if (!found) {
-                                range.selectNodeContents(element);
-                                range.collapse(false);
-                              }
-
-                              sel.removeAllRanges();
-                              sel.addRange(range);
-                            } catch (err) {
-                              console.warn('Failed to restore cursor position in header:', err);
-                            }
-                          });
                         }}
                         onBlur={() => setEditingHeader(null)}
                         onKeyDown={e => e.key === 'Enter' && setEditingHeader(null)}
