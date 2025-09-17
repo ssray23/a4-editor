@@ -808,17 +808,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
           });
         }
 
-        // Target stat boxes
-        if (block.type === 'stat-grid') {
-          const statElements = document.querySelectorAll('.stat [contenteditable="true"]');
-          statElements.forEach(el => {
-            el.style.setProperty('direction', 'ltr', 'important');
-            el.style.setProperty('text-align', 'center', 'important');
-            el.style.setProperty('unicode-bidi', 'normal', 'important');
-            el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
-            el.setAttribute('dir', 'ltr');
-          });
-        }
 
       }, 50);
 
@@ -838,13 +827,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     });
   });
 
-  // Set document direction to LTR globally
-  useEffect(() => {
-    document.documentElement.setAttribute('dir', 'ltr');
-    document.documentElement.style.direction = 'ltr';
-    document.body.setAttribute('dir', 'ltr');
-    document.body.style.direction = 'ltr';
-  }, []);
 
   // --- START: REUSABLE LTR ENFORCEMENT FUNCTION ---
   function enforceLTR(element) {
@@ -1076,26 +1058,48 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
         <div className={selected ? "stat-grid stat-grid-editing" : "stat-grid"}>
           {(block.stats||[]).map((s,idx)=> (
             <div className="stat" key={idx} style={{direction:'ltr'}}>
-              <div className="big" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx}
-                onInput={e=>{
-                  const element = e.currentTarget;
-                  // Use innerHTML but clean up HTML entities for display
-                  const html = element.innerHTML || '';
-                  const cleanText = html.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+              <input className="big"
+                value={s.value}
+                onChange={e=>{
                   const stats = [...(block.stats||[])];
-                  stats[idx].value = cleanText;
+                  stats[idx].value = e.target.value;
                   onChange({ stats });
-                }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.value}</div>
-              <div className="sub" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx}
-                onInput={e=>{
-                  const element = e.currentTarget;
-                  // Use innerHTML but clean up HTML entities for display
-                  const html = element.innerHTML || '';
-                  const cleanText = html.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                }}
+                style={{
+                  direction:'ltr',
+                  textAlign:'center',
+                  background:'transparent',
+                  border:'none',
+                  outline:'none',
+                  width:'100%',
+                  fontSize:'28px',
+                  color:theme,
+                  fontWeight:'800',
+                  lineHeight:'1.1',
+                  fontFamily:'Helvetica, Arial, sans-serif'
+                }}
+                dir="ltr" />
+              <input className="sub"
+                value={s.title}
+                onChange={e=>{
                   const stats = [...(block.stats||[])];
-                  stats[idx].title = cleanText;
+                  stats[idx].title = e.target.value;
                   onChange({ stats });
-                }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.title}</div>
+                }}
+                style={{
+                  direction:'ltr',
+                  textAlign:'center',
+                  background:'transparent',
+                  border:'none',
+                  outline:'none',
+                  width:'100%',
+                  fontSize:'14px',
+                  color:theme,
+                  lineHeight:'1.3',
+                  margin:'10px 0',
+                  fontFamily:'Helvetica, Arial, sans-serif'
+                }}
+                dir="ltr" />
             </div>
           ))}
         </div>
@@ -1167,9 +1171,14 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         contentEditable
                         suppressContentEditableWarning
                         dir="ltr"
-                        // onInput={e=>updateHeader(hi,e.target.textContent)}
                         onInput={e => {
                           const element = e.currentTarget;
+                          // Aggressive LTR enforcement
+                          element.style.setProperty('direction', 'ltr', 'important');
+                          element.style.setProperty('unicode-bidi', 'normal', 'important');
+                          element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+                          element.setAttribute('dir', 'ltr');
+
                           const text = element.textContent || '';
                           updateHeader(hi, text);
                         }}
@@ -1185,13 +1194,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           fontSize: 'inherit',
                           outline: 'none',
                           fontFamily: 'Helvetica',
-                          minHeight: '20px',
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                          whiteSpace: 'normal',
-                          direction: 'ltr',
-                          textAlign: 'left',
-                          unicodeBidi: 'normal'
+                          direction: 'ltr !important',
+                          textAlign: 'left !important',
+                          unicodeBidi: 'normal !important',
+                          writingMode: 'horizontal-tb !important'
                         }}
                       >
                         {h}
@@ -1257,11 +1263,15 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           if (el) {
                             cellRefs.current[`${ri}-${ci}`] = el;
                             // Force LTR immediately when ref is set
-                            el.style.direction = 'ltr';
-                            el.style.textAlign = 'left';
-                            el.style.unicodeBidi = 'normal';
+                            el.style.setProperty('direction', 'ltr', 'important');
+                            el.style.setProperty('text-align', 'left', 'important');
+                            el.style.setProperty('unicode-bidi', 'normal', 'important');
+                            el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
                             el.setAttribute('dir', 'ltr');
-                            // Don't set innerHTML - let JSX content handle it
+                            // Set initial content only if element is empty
+                            if (el.innerHTML !== (c || '')) {
+                              el.innerHTML = c || '';
+                            }
                           }
                         }}
                         contentEditable
@@ -1269,6 +1279,12 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         dir="ltr"
                         onInput={e => {
                           const element = e.currentTarget;
+                          // Aggressive LTR enforcement on input
+                          element.style.setProperty('direction', 'ltr', 'important');
+                          element.style.setProperty('unicode-bidi', 'normal', 'important');
+                          element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+                          element.setAttribute('dir', 'ltr');
+
                           const html = element.innerHTML || '';
                           updateCell(ri,ci,html);
                         }}
@@ -1290,7 +1306,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           border: 'none',
                           background: 'transparent',
                           outline: selectedCell?.r === ri && selectedCell?.c === ci ? `2px solid ${theme}` : 'none',
-                          fontWeight: boldCells.has(`${ri}-${ci}`) ? 'bold' : 'normal',
                           fontSize: '16px',
                           padding: '2px',
                           fontFamily: 'Helvetica',
@@ -1299,11 +1314,12 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           overflowWrap: 'break-word',
                           whiteSpace: 'normal',
                           lineHeight: '1.6',
-                          direction: 'ltr',
-                          textAlign: 'left',
-                          unicodeBidi: 'normal'
+                          direction: 'ltr !important',
+                          textAlign: 'left !important',
+                          unicodeBidi: 'normal !important',
+                          writingMode: 'horizontal-tb !important'
                         }}
-                      >{c || ''}</div>
+                      ></div>
                     </td>
                   ))}
                   <td style={{
