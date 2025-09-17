@@ -42,6 +42,7 @@ function A4Editor() {
   const [isBoldActive, setIsBoldActive] = useState(false);
   const [showListButton, setShowListButton] = useState(false);
   const [isListActive, setIsListActive] = useState(false);
+  const [importedFilename, setImportedFilename] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("a4.blocks.v2", JSON.stringify(blocks));
@@ -350,6 +351,9 @@ ${body}
       return;
     }
 
+    // Store the filename
+    setImportedFilename(file.name);
+
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -483,10 +487,17 @@ ${body}
         }
       }}
     >
-      <div style={{position:'sticky', top:0, zIndex:100, background:'#f6f7f8', padding:'18px 0', marginBottom:12, borderBottom:'1px solid #ddd'}}>
-        <div style={{display:'flex', gap:12, alignItems:'center'}}>
-          <h3 style={{margin:0}}>A4 Editor</h3>
-          <div style={{display:'flex', gap:8, alignItems:'center'}}>
+      <div style={{position:'sticky', top:0, zIndex:9999, background: `linear-gradient(to bottom, ${theme}25, ${theme}15)`, backdropFilter: 'blur(8px)', padding:'18px 24px', marginBottom:12, border:`2px solid ${theme}`, borderRadius:'16px', margin:'0 16px 12px 16px', boxShadow:'0 4px 12px rgba(0,0,0,0.2)'}}>
+        <div style={{display:'flex', gap:12, alignItems:'center', justifyContent:'space-between'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+            <h3 style={{margin:0, color: theme}}>A4 Editor</h3>
+            {importedFilename && (
+              <span style={{fontSize:'12px', color:'#666', fontStyle:'italic', background:'white', padding:'4px 8px', borderRadius:'12px', border:`1px solid ${theme}50`}}>
+                📄 {importedFilename}
+              </span>
+            )}
+          </div>
+          <div style={{display:'flex', gap:8, alignItems:'center', justifyContent:'center', flex:1, paddingRight:'200px'}}>
             <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
               <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎨</button>
               <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Colour</span>
@@ -520,7 +531,10 @@ ${body}
             {showColorPicker && (
               <div style={{ position: 'absolute', zIndex: 1000, top: '50px', left: '-10px' }}>
                 <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, left: 0 }} onClick={() => setShowColorPicker(false)} />
-                <SketchPicker color={theme} onChangeComplete={color => setTheme(color.hex)} />
+                <SketchPicker color={theme} onChangeComplete={color => {
+                  setTheme(color.hex);
+                  setShowColorPicker(false);
+                }} />
               </div>
             )}
             <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
@@ -592,11 +606,17 @@ ${body}
               <button onClick={clearAll} title="Clear All Content" style={{width:'40px', height:'40px', border:'2px solid #ff4444', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
               <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Clear</span>
             </div>
-            <label style={{background:'white', color:'#333', border:'2px solid #666', borderRadius:'25px', padding:'12px 24px', cursor:'pointer', fontSize:'14px', fontWeight:'600', fontFamily:'Helvetica', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>
-              📥 Import HTML
-              <input type="file" accept=".html" onChange={importHtml} style={{display:'none'}} />
-            </label>
-            <button onClick={exportHtml} style={{background:'white', color:'#333', border:'2px solid #666', borderRadius:'25px', padding:'12px 24px', cursor:'pointer', fontSize:'14px', fontWeight:'600', fontFamily:'Helvetica', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>📤 Export HTML</button>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <label style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>
+                📥
+                <input type="file" accept=".html" onChange={importHtml} style={{display:'none'}} />
+              </label>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Import</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={exportHtml} style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)', transition:'all 0.3s ease'}}>📤</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Export</span>
+            </div>
           </div>
         </div>
       </div>
