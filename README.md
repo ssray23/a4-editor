@@ -320,13 +320,13 @@ npm run build
 ### v2.2.0 - Text Direction and WYSIWYG Improvements (September 2025)
 
 #### 🔧 Major Bug Fixes
-- **Fixed Timeline RTL Text Issue** - Resolved persistent right-to-left text display in timeline elements showing reversed text like "1 tneve" instead of "Event 1"
+- **Fixed Timeline RTL Text Issue** - Completely resolved persistent right-to-left text display by switching from contentEditable to native HTML input elements, eliminating reversed text like "1 tneve" and ensuring proper display like "Event 1"
 - **Text Selection Restoration** - Fixed broken text selection in table cells where users couldn't select individual words or use double-click selection
 - **Cursor Jump Prevention** - Eliminated cursor jumping to start of text blocks when typing in paragraphs, cards, and other contentEditable elements
 
 #### ⚡ WYSIWYG Enhancements
 - **Seamless Stat Card Editing** - Removed white background overlays and borders during editing while preserving original card styling
-- **Timeline Visual Continuity** - Converted timeline from input fields to contentEditable divs maintaining visual consistency during editing
+- **Timeline Input Optimization** - Converted timeline to native HTML input elements providing superior text direction control and eliminating RTL display issues
 - **Fact Card Boundary Removal** - Eliminated editing boundaries for cleaner WYSIWYG experience across all card types
 
 #### 🎯 Toolbar Improvements

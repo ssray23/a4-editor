@@ -277,7 +277,8 @@ function A4Editor() {
     if (type === "card") base.html = "<strong>This is a bolded header</strong><br><br>This is some regular text that follows the header. You can select any text and use the bold button or Ctrl+B to format it. This card demonstrates how you can mix bold and regular text within the same element.";
     if (type === "timeline") base.events = [
       { year: "2025", desc: "Event 1 description" },
-      { year: "2026", desc: "Event 2 description" },
+      { year: "2023", desc: "Event 2 description" },
+      { year: "2023", desc: "Event 3 description" },
     ];
     if (type === "citation") base.html = "Author. Title. Publisher. Year.";
     if (type === "hr") base.html = "";
@@ -487,7 +488,7 @@ ${body}
         }
       }}
     >
-      <div style={{position:'sticky', top:0, zIndex:9999, background: `linear-gradient(to bottom, ${theme}25, ${theme}15)`, backdropFilter: 'blur(8px)', padding:'18px 24px', marginBottom:12, border:`2px solid ${theme}`, borderRadius:'16px', margin:'0 16px 12px 16px', boxShadow:'0 4px 12px rgba(0,0,0,0.2)'}}>
+      <div style={{position:'sticky', top:'16px', zIndex:9999, background: `linear-gradient(to bottom, ${theme}25, ${theme}15)`, backdropFilter: 'blur(8px)', padding:'18px 24px', marginBottom:12, border:`2px solid ${theme}`, borderRadius:'16px', margin:'0 16px 12px 16px', boxShadow:'0 4px 12px rgba(0,0,0,0.2)'}}>
         <div style={{display:'flex', gap:12, alignItems:'center', justifyContent:'space-between'}}>
           <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
             <h3 style={{margin:0, color: theme}}>A4 Editor</h3>
@@ -818,6 +819,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
             el.setAttribute('dir', 'ltr');
           });
         }
+
       }, 50);
 
       return () => clearInterval(interval);
@@ -836,9 +838,63 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     });
   });
 
+  // Set document direction to LTR globally
+  useEffect(() => {
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.documentElement.style.direction = 'ltr';
+    document.body.setAttribute('dir', 'ltr');
+    document.body.style.direction = 'ltr';
+  }, []);
+
+  // --- START: REUSABLE LTR ENFORCEMENT FUNCTION ---
+  function enforceLTR(element) {
+    if (element) {
+      element.style.setProperty('direction', 'ltr', 'important');
+      element.style.setProperty('unicode-bidi', 'normal', 'important');
+      element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+      element.setAttribute('dir', 'ltr');
+    }
+  }
+
+  // Reusable ref callback for LTR enforcement
+  const ltrRef = (element) => {
+    enforceLTR(element);
+    return element;
+  };
+
+  // Aggressive timeline onInput that forces correct display
+  function timelineOnInput(field, idx) {
+    return (e) => {
+      const element = e.currentTarget;
+
+      // Get the current text
+      const text = element.textContent || '';
+
+      // Update the data immediately
+      updateEvent(idx, field, text);
+
+      // Force correct display by directly setting content
+      setTimeout(() => {
+        if (element && text) {
+          // Temporarily disable contentEditable to prevent interference
+          element.contentEditable = false;
+          element.textContent = text;
+          element.contentEditable = true;
+
+          // Aggressive LTR enforcement
+          element.style.setProperty('direction', 'ltr', 'important');
+          element.style.setProperty('unicode-bidi', 'normal', 'important');
+          element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+          element.setAttribute('dir', 'ltr');
+        }
+      }, 1);
+    };
+  }
+
   // --- START: MINIMAL onInput FUNCTION ---
   function onInput(e) {
     const element = e.currentTarget;
+    enforceLTR(element);
     const html = element.innerHTML || '';
     onChange({ html });
     // No cursor restoration - let the browser handle cursor position naturally
@@ -878,6 +934,18 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   // Timeline helpers
   function updateEvent(idx, key, val){
     const events = [...block.events]; events[idx][key] = val; onChange({ events });
+  }
+
+  function addTimelineEvent(){
+    const events = [...(block.events||[])];
+    events.push({ year: "2024", desc: "Event description" });
+    onChange({ events });
+  }
+
+  function removeTimelineEvent(idx){
+    const events = [...(block.events||[])];
+    events.splice(idx, 1);
+    onChange({ events });
   }
 
   // Column resize helpers
@@ -1008,20 +1076,26 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
         <div className={selected ? "stat-grid stat-grid-editing" : "stat-grid"}>
           {(block.stats||[]).map((s,idx)=> (
             <div className="stat" key={idx} style={{direction:'ltr'}}>
-              <div className="big" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx} onInput={e=>{
-                const element = e.currentTarget;
-                const text = element.textContent || '';
-                const stats = [...(block.stats||[])];
-                stats[idx].value = text;
-                onChange({ stats });
-              }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.value}</div>
-              <div className="sub" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx} onInput={e=>{
-                const element = e.currentTarget;
-                const text = element.textContent || '';
-                const stats = [...(block.stats||[])];
-                stats[idx].title = text;
-                onChange({ stats });
-              }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.title}</div>
+              <div className="big" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx}
+                onInput={e=>{
+                  const element = e.currentTarget;
+                  // Use innerHTML but clean up HTML entities for display
+                  const html = element.innerHTML || '';
+                  const cleanText = html.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                  const stats = [...(block.stats||[])];
+                  stats[idx].value = cleanText;
+                  onChange({ stats });
+                }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.value}</div>
+              <div className="sub" contentEditable suppressContentEditableWarning={true} data-stat-idx={idx}
+                onInput={e=>{
+                  const element = e.currentTarget;
+                  // Use innerHTML but clean up HTML entities for display
+                  const html = element.innerHTML || '';
+                  const cleanText = html.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                  const stats = [...(block.stats||[])];
+                  stats[idx].title = cleanText;
+                  onChange({ stats });
+                }} style={{direction:'ltr', textAlign:'center'}} dir="ltr">{s.title}</div>
             </div>
           ))}
         </div>
@@ -1187,10 +1261,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                             el.style.textAlign = 'left';
                             el.style.unicodeBidi = 'normal';
                             el.setAttribute('dir', 'ltr');
-                            // Set initial content only if element is empty
-                            if (el.innerHTML !== (c || '')) {
-                              el.innerHTML = c || '';
-                            }
+                            // Don't set innerHTML - let JSX content handle it
                           }
                         }}
                         contentEditable
@@ -1232,7 +1303,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           textAlign: 'left',
                           unicodeBidi: 'normal'
                         }}
-                      ></div>
+                      >{c || ''}</div>
                     </td>
                   ))}
                   <td style={{
@@ -1271,49 +1342,83 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
       )}
 
       {block.type==='timeline' && (
-        <div className={selected ? "timeline timeline-editing" : "timeline"}>
-          {(block.events||[]).map((ev,idx)=>(
-            <div className="timeline-event" key={idx} style={{display:'flex',gap:12,marginBottom:12}}>
-              <div className="year"
-                contentEditable
-                suppressContentEditableWarning
-                ref={el => {
-                  if (el) {
-                    // Use innerHTML like working elements
-                    if (el.innerHTML !== ev.year) {
-                      el.innerHTML = ev.year;
-                    }
-                  }
-                }}
-                onInput={e=>{
-                  const element = e.currentTarget;
-                  // Use innerHTML like working elements
-                  const html = element.innerHTML || '';
-                  updateEvent(idx, 'year', html);
-                }}
-                style={{width:'60px', fontFamily:'Helvetica', fontWeight:'700', color: theme, fontSize:'16px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}}
-                dir="ltr"></div>
-              <div className="desc"
-                contentEditable
-                suppressContentEditableWarning
-                ref={el => {
-                  if (el) {
-                    // Use innerHTML like working elements
-                    if (el.innerHTML !== ev.desc) {
-                      el.innerHTML = ev.desc;
-                    }
-                  }
-                }}
-                onInput={e=>{
-                  const element = e.currentTarget;
-                  // Use innerHTML like working elements
-                  const html = element.innerHTML || '';
-                  updateEvent(idx, 'desc', html);
-                }}
-                style={{flex:1, fontFamily:'Helvetica', fontSize:'16px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}}
-                dir="ltr"></div>
+        <div>
+          {selected && (
+            <div style={{marginBottom:12, display:'flex', gap:8, alignItems:'center'}}>
+              <button onClick={e=>{e.stopPropagation(); addTimelineEvent();}} title="Add Timeline Event" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
+              <span style={{fontSize:'12px', color:'#666', fontFamily:'Helvetica'}}>Add Event</span>
             </div>
-          ))}
+          )}
+          <div className={selected ? "timeline timeline-editing" : "timeline"}>
+            {(block.events||[]).map((ev,idx)=>(
+              <div className="timeline-event" key={idx} style={{position:'relative'}}>
+                {selected && (
+                  <button
+                    onClick={e=>{e.stopPropagation(); removeTimelineEvent(idx);}}
+                    title="Delete Event"
+                    style={{
+                      position:'absolute',
+                      right:'-10px',
+                      top:'-10px',
+                      width:'20px',
+                      height:'20px',
+                      border:'1px solid #ff4444',
+                      borderRadius:'50%',
+                      background:'#ff4444',
+                      color:'white',
+                      cursor:'pointer',
+                      fontSize:'10px',
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      boxShadow:'0 1px 3px rgba(0,0,0,0.2)',
+                      zIndex:10
+                    }}
+                  >×</button>
+                )}
+                <input
+                  className="year"
+                  value={ev.year}
+                  onChange={(e) => updateEvent(idx, 'year', e.target.value)}
+                  style={{
+                    direction:'ltr',
+                    textAlign:'center',
+                    background:'transparent',
+                    border:'none',
+                    outline:'none',
+                    width:'40px',
+                    position:'absolute',
+                    left:'-10px',
+                    top:'50%',
+                    transform:'translateY(-50%) rotate(-90deg)',
+                    fontSize:'14px',
+                    fontWeight:'600',
+                    color:theme,
+                    fontFamily:'Helvetica, Arial, sans-serif',
+                    whiteSpace:'nowrap'
+                  }}
+                  dir="ltr" />
+                <input
+                  className="desc"
+                  value={ev.desc}
+                  onChange={(e) => updateEvent(idx, 'desc', e.target.value)}
+                  style={{
+                    direction:'ltr',
+                    textAlign:'left',
+                    background:'#fff',
+                    border:'1px solid #e0e0e0',
+                    borderRadius:'8px',
+                    padding:'16px',
+                    width:'100%',
+                    fontSize:'14px',
+                    color:'#333',
+                    fontFamily:'Helvetica, Arial, sans-serif',
+                    boxShadow:'0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                  dir="ltr" />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -1458,9 +1563,12 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
 .bullet-list { padding-left:24px; margin:10px 0; direction:ltr !important; text-align:left !important; unicode-bidi:normal !important; font-family:Helvetica; }
 .bullet-list li { margin-bottom:6px; direction:ltr !important; text-align:left !important; unicode-bidi:normal !important; line-height:1.6; }
 .bullet-list-editing { background:rgba(255,255,255,0.8); border-radius:4px; padding:8px; }
-.timeline { border-left:3px solid ${theme}; margin:12px 0; padding-left:16px; font-family:Helvetica; }
-.timeline-event { display:flex; gap:12px; margin-bottom:12px; font-family:Helvetica; }
-.timeline-event .year { font-weight:700; width:60px; color:${theme}; font-family:Helvetica; }
+.timeline { position: relative; margin: 20px 0 20px 60px; padding: 0; font-family: Helvetica, Arial, sans-serif; }
+.timeline::before { content: ''; position: absolute; inset-inline-start: 50px; top: 0; bottom: 0; width: 2px; background: ${theme}; }
+.timeline-event { position: relative; margin-bottom: 24px; padding-inline-start: 70px; font-family: Helvetica, Arial, sans-serif; }
+.timeline-event::before { content: ''; position: absolute; inset-inline-start: 42px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: ${theme}; border: 3px solid #fff; box-shadow: 0 0 0 2px ${theme}; }
+.timeline-event .year { position: absolute; inset-inline-start: -10px; top: 50%; transform: translateY(-50%) rotate(-90deg); transform-origin: center; font-size: 14px; font-weight: 600; color: ${theme}; line-height: 1; font-family: Helvetica, Arial, sans-serif; width: 40px; text-align: center; white-space: nowrap; }
+.timeline-event .desc { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 14px; color: #333; line-height: 1.5; font-family: Helvetica, Arial, sans-serif; text-align: start; }
 .citation { font-size:14px; font-style:italic; color:#444; margin:8px 0; }
 .divider { border:none; height:4px; background:${useThemeColor ? theme : '#000000'}; margin:20px 0; width:100%; }
 button:hover { opacity: 0.8; transform: translateY(-1px); transition: all 0.2s ease; }
@@ -1483,9 +1591,11 @@ table td, table th { text-align: left !important; }
 .stat-grid-editing .stat { border: 1.5px solid #000; background: ${theme}27; }
 .stat-grid-editing .stat .big:hover, .stat-grid-editing .stat .sub:hover { outline: none; border: none; }
 .stat-grid-editing .stat .big:focus, .stat-grid-editing .stat .sub:focus { outline: none !important; border: none !important; }
-.timeline-editing { border-left: 3px solid ${theme}; }
-.timeline-editing .year:hover, .timeline-editing .desc:hover { outline: none; border: none; }
-.timeline-editing .year:focus, .timeline-editing .desc:focus { outline: none !important; border: none !important; }
+.timeline-editing .timeline-event .desc { border-color: ${theme}; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.timeline-editing .timeline-event::before { background: ${theme}; box-shadow: 0 0 0 3px ${theme}; }
+.timeline-editing .year:hover, .timeline-editing .desc:hover { outline: none; }
+.timeline-editing .year:focus { outline: none !important; background: rgba(255,255,255,0.9); border-radius: 4px; padding: 2px; }
+.timeline-editing .desc:focus { outline: none !important; border-color: ${theme}; box-shadow: 0 0 0 2px ${theme}40; }
 .timeline-editing .year, .timeline-editing .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
 .timeline .year, .timeline .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
