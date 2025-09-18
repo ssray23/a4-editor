@@ -488,6 +488,145 @@ Enhanced editing experience through:
 - **Document Versioning** - Use export/import for document version control
 - **Template Creation** - Export formatted documents as reusable templates
 
+## 🛠️ Technical Troubleshooting Guide
+
+### RTL (Right-to-Left) Text Issues
+
+If you encounter text appearing in reverse order (e.g., "Update" appears as "etadpU"):
+
+#### Root Cause
+- Browser text direction getting confused due to mixed content or CSS conflicts
+- contentEditable elements not properly enforcing LTR (Left-to-Right) direction
+
+#### Definitive Solution Pattern
+```javascript
+// WORKING PATTERN for all contentEditable elements:
+ref={el => {
+  if (el) {
+    // LTR enforcement on element creation
+    el.style.setProperty('direction', 'ltr', 'important');
+    el.style.setProperty('text-align', 'left', 'important');
+    el.style.setProperty('unicode-bidi', 'normal', 'important');
+    el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+    el.setAttribute('dir', 'ltr');
+    // Content initialization ONLY when different
+    if (el.innerHTML !== (content || '')) {
+      el.innerHTML = content || '';
+    }
+  }
+}}
+onInput={e => {
+  const element = e.currentTarget;
+  // Aggressive LTR enforcement on every keystroke
+  element.style.setProperty('direction', 'ltr', 'important');
+  element.style.setProperty('unicode-bidi', 'normal', 'important');
+  element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+  element.setAttribute('dir', 'ltr');
+  // Use innerHTML for content extraction
+  const html = element.innerHTML || '';
+  updateContent(html);
+}}
+```
+
+#### Key Requirements
+- ✅ Use `innerHTML` (not `textContent`) for content management
+- ✅ Apply LTR enforcement on both ref creation AND every input event
+- ✅ Empty contentEditable div (no React children)
+- ✅ Conditional innerHTML setting to avoid unnecessary updates
+
+### Cursor Jumping Issues
+
+If cursor jumps to start of text when typing:
+
+#### Root Cause
+- React re-renders causing DOM replacement during typing
+- contentEditable content managed incorrectly causing cursor reset
+
+#### Solution
+1. **Never use React children in contentEditable** - Use empty div: `></div>`
+2. **Use ref callback for content** - Set innerHTML only when different
+3. **Minimal onInput handlers** - Avoid complex DOM manipulation during typing
+4. **Let browser handle cursor** - Don't try to restore cursor position
+
+#### What NOT to Do
+```javascript
+// ❌ WRONG: React children cause cursor jumping
+<div contentEditable>{content}</div>
+
+// ❌ WRONG: Setting innerHTML unconditionally
+el.innerHTML = content; // Always sets, causes cursor reset
+
+// ❌ WRONG: Using textContent loses formatting
+const text = element.textContent;
+```
+
+#### What TO Do
+```javascript
+// ✅ CORRECT: Empty div, conditional innerHTML
+<div contentEditable ref={el => {
+  if (el && el.innerHTML !== content) {
+    el.innerHTML = content;
+  }
+}}></div>
+```
+
+### WYSIWYG Bold Rendering Issues
+
+If bold text appears differently in edit vs rendered mode:
+
+#### Root Cause
+- Mixing CSS `font-weight: bold` with HTML `<b>` tags
+- Inconsistent content management between edit and render
+
+#### Solution
+1. **Remove CSS bold conflicts** - Don't apply `font-weight: bold` via CSS if using HTML tags
+2. **Use innerHTML consistently** - Same content extraction method for edit and render
+3. **Eliminate boldCells array** - Rely solely on HTML `<b>` tags for formatting
+
+### Delete Button Positioning Issues
+
+If delete buttons appear in wrong positions:
+
+#### For Column Delete Buttons
+```css
+position: absolute;
+top: 50%;
+right: 8px;
+transform: translateY(-50%);
+```
+
+#### For Row Delete Buttons
+```css
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+```
+
+### Table Cell Padding Inconsistencies
+
+If edit mode has different padding than rendered mode:
+
+#### Solution
+- **Remove padding from `<td>`**: `padding: '0px'`
+- **Add padding to contentEditable div**: `padding: '8px 10px'`
+- **Ensure single layer of padding** - Don't double up padding on nested elements
+
+### General Debugging Approach
+
+1. **Check commit 9a26c75** - Contains definitive working patterns
+2. **Copy from working elements** - If table cells work, copy their exact implementation
+3. **Use minimal DOM manipulation** - Less is more with contentEditable
+4. **Test systematically** - RTL, cursor jumping, and formatting separately
+5. **Maintain pattern consistency** - All similar elements should use identical patterns
+
+### Emergency Fixes
+
+If issues reappear:
+1. **Revert to commit 9a26c75** - Contains proven working implementation
+2. **Apply exact table cell pattern** - Copy working implementation to broken elements
+3. **Avoid mixing patterns** - Don't use different approaches for similar elements
+
 ## 🤝 Contributing
 
 This project welcomes contributions! Whether it's bug reports, feature requests, or code contributions, all are appreciated.
