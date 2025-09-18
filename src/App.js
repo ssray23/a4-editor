@@ -6,7 +6,7 @@ function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'
 
 // Simple fix based on Stack Overflow research - just force dir attribute
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr; unicode-bidi:normal;">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left !important; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important;" dir="ltr">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
@@ -782,11 +782,12 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   // Focus header editor when editing starts
   useEffect(() => {
     if (editingHeader !== null && headerEditRef.current) {
-      headerEditRef.current.focus();
+      const element = headerEditRef.current;
+      element.focus();
       // Select all text for easy editing
       const selection = window.getSelection();
       const range = document.createRange();
-      range.selectNodeContents(headerEditRef.current);
+      range.selectNodeContents(element);
       selection.removeAllRanges();
       selection.addRange(range);
     }
@@ -1167,13 +1168,27 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   }}>
                     {editingHeader === hi ? (
                       <div
-                        ref={headerEditRef}
+                        ref={el => {
+                          if (el) {
+                            headerEditRef.current = el;
+                            // Force LTR immediately when ref is set (same as table cells)
+                            el.style.setProperty('direction', 'ltr', 'important');
+                            el.style.setProperty('text-align', 'left', 'important');
+                            el.style.setProperty('unicode-bidi', 'normal', 'important');
+                            el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+                            el.setAttribute('dir', 'ltr');
+                            // Set initial content only if element is empty
+                            if (el.innerHTML !== (h || '')) {
+                              el.innerHTML = h || '';
+                            }
+                          }
+                        }}
                         contentEditable
                         suppressContentEditableWarning
                         dir="ltr"
                         onInput={e => {
                           const element = e.currentTarget;
-                          // Aggressive LTR enforcement
+                          // Aggressive LTR enforcement on input (same as table cells)
                           element.style.setProperty('direction', 'ltr', 'important');
                           element.style.setProperty('unicode-bidi', 'normal', 'important');
                           element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
@@ -1199,9 +1214,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           unicodeBidi: 'normal !important',
                           writingMode: 'horizontal-tb !important'
                         }}
-                      >
-                        {h}
-                      </div>
+                      />
                     ) : (
                       <span
                         onClick={e => {e.stopPropagation(); setEditingHeader(hi);}}
