@@ -6,7 +6,7 @@ function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'
 
 // Simple fix based on Stack Overflow research - just force dir attribute
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left !important; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important;" dir="ltr">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal;">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}%; ` : ''}padding:8px 10px; text-align:left !important; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important;" dir="ltr">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}%; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; line-height:1.4;">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; max-width:100%; table-layout:fixed; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
@@ -36,6 +36,84 @@ function A4Editor() {
       return [];
     }
   });
+
+  // Undo history
+  const [undoHistory, setUndoHistory] = useState([]);
+  const [redoHistory, setRedoHistory] = useState([]);
+
+  // Save current state to history before making changes
+  const saveToHistory = () => {
+    console.log('saveToHistory: saving current blocks to history');
+    console.log('current blocks[1].stats:', blocks.find(b => b.type === 'stat-grid')?.stats);
+    setUndoHistory(prev => [...prev.slice(-19), blocks]); // Keep last 20 states
+    setRedoHistory([]); // Clear redo history when new action is performed
+  };
+
+  // Debounced save for content changes
+  const [contentChangeTimer, setContentChangeTimer] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // This function is no longer used - keeping for backwards compatibility
+  const saveToHistoryDebounced = () => {
+    console.log('WARNING: saveToHistoryDebounced should not be called anymore');
+  };
+
+  // Undo function
+  const undo = () => {
+    console.log('undo: undoHistory.length:', undoHistory.length);
+    if (undoHistory.length > 0) {
+      // Debug: Check all history entries
+      undoHistory.forEach((historyState, index) => {
+        const historyStats = historyState.find(b => b.type === 'stat-grid')?.stats;
+        console.log(`History[${index}] stats[1].title:`, historyStats?.[1]?.title);
+      });
+
+      const previousState = undoHistory[undoHistory.length - 1];
+      const currentStats = blocks.find(b => b.type === 'stat-grid')?.stats;
+      const previousStats = previousState.find(b => b.type === 'stat-grid')?.stats;
+
+      console.log('undo: current stats[1].title:', currentStats?.[1]?.title);
+      console.log('undo: previous stats[1].title:', previousStats?.[1]?.title);
+      console.log('undo: restoring previous state');
+
+      setRedoHistory(prev => [blocks, ...prev.slice(0, 19)]); // Keep last 20 redo states
+      setUndoHistory(prev => prev.slice(0, -1));
+      setBlocks(previousState);
+
+      // Force update by logging the new state after a brief delay
+      setTimeout(() => {
+        console.log('undo: after setBlocks, current blocks should be updated');
+      }, 10);
+    } else {
+      console.log('undo: no history available');
+    }
+  };
+
+  // Redo function
+  const redo = () => {
+    if (redoHistory.length > 0) {
+      const nextState = redoHistory[0];
+      setUndoHistory(prev => [...prev.slice(-19), blocks]);
+      setRedoHistory(prev => prev.slice(1));
+      setBlocks(nextState);
+    }
+  };
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if (e.ctrlKey && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        redo();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [undoHistory, redoHistory, blocks]);
   const [selected, setSelected] = useState(null);
   const [hasTextSelection, setHasTextSelection] = useState(false);
   const [showBoldButton, setShowBoldButton] = useState(false);
@@ -262,6 +340,7 @@ function A4Editor() {
   }
 
   function addBlock(type) {
+    saveToHistory();
     const base = { id: genId(), type, html: "" };
     if (type === "h1") base.html = "Heading 1";
     if (type === "h2") base.html = "Heading 2";
@@ -301,16 +380,51 @@ function A4Editor() {
     setSelected(base.id);
   }
 
-  function updateBlock(id, patch) {
+  function updateBlock(id, patch, isContentChange = false) {
+    console.log('updateBlock called:', { id, patch, isContentChange });
+
+    // Capture current state before any changes
+    const currentBlocks = blocks;
+
+    if (isContentChange) {
+      // For content changes, save BEFORE applying the change
+      console.log('calling saveToHistoryDebounced BEFORE applying change');
+      if (!hasUnsavedChanges) {
+        console.log('First change - saving current state before applying');
+
+        // Save the current state explicitly (before changes)
+        console.log('Saving currentBlocks with stats[1].title:', currentBlocks.find(b => b.type === 'stat-grid')?.stats?.[1]?.title);
+        setUndoHistory(prev => [...prev.slice(-19), currentBlocks]);
+        setRedoHistory([]);
+
+        setHasUnsavedChanges(true);
+        if (contentChangeTimer) {
+          clearTimeout(contentChangeTimer);
+        }
+        const timer = setTimeout(() => {
+          console.log('resetting hasUnsavedChanges to false');
+          setHasUnsavedChanges(false);
+        }, 2000);
+        setContentChangeTimer(timer);
+      } else {
+        console.log('Skipping save - recent changes exist');
+      }
+    } else {
+      // For structural changes, save immediately
+      console.log('calling saveToHistory directly');
+      saveToHistory();
+    }
     setBlocks(b => b.map(x => x.id === id ? { ...x, ...patch } : x));
   }
 
   function removeBlock(id) {
+    saveToHistory();
     setBlocks(b => b.filter(x => x.id !== id));
   }
 
   function clearAll() {
     if (window.confirm('Are you sure you want to clear all content?')) {
+      saveToHistory();
       setBlocks([]);
       setSelected(null);
     }
@@ -560,6 +674,54 @@ ${body}
               </div>
             )}
             <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button
+                onClick={undo}
+                disabled={undoHistory.length === 0}
+                title="Undo"
+                style={{
+                  width:'40px',
+                  height:'40px',
+                  border:'2px solid #666',
+                  borderRadius:'50%',
+                  background: undoHistory.length === 0 ? '#f0f0f0' : 'white',
+                  cursor: undoHistory.length === 0 ? 'not-allowed' : 'pointer',
+                  fontSize:'16px',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                  opacity: undoHistory.length === 0 ? 0.5 : 1
+                }}
+              >
+                ↶
+              </button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Undo</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button
+                onClick={redo}
+                disabled={redoHistory.length === 0}
+                title="Redo"
+                style={{
+                  width:'40px',
+                  height:'40px',
+                  border:'2px solid #666',
+                  borderRadius:'50%',
+                  background: redoHistory.length === 0 ? '#f0f0f0' : 'white',
+                  cursor: redoHistory.length === 0 ? 'not-allowed' : 'pointer',
+                  fontSize:'16px',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                  opacity: redoHistory.length === 0 ? 0.5 : 1
+                }}
+              >
+                ↷
+              </button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Redo</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
               <button onClick={()=>addBlock('h1')} title="Add H1" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>📝</button>
               <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>H1</span>
             </div>
@@ -664,11 +826,16 @@ ${body}
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                       <BlockEditor
                         block={block}
-                        onChange={patch => updateBlock(block.id, patch)}
+                        onChange={patch => {
+                          // All changes should use debounced save (like paragraphs)
+                          updateBlock(block.id, patch, true);
+                        }}
                         onRemove={() => removeBlock(block.id)}
                         onSelect={() => setSelected(block.id)}
                         selected={selected===block.id}
                         theme={theme}
+                        useThemeColor={useThemeColor}
+                        onSaveToHistory={saveToHistory}
                       />
                     </div>
                   )}
@@ -684,7 +851,7 @@ ${body}
 }
 
 // --- Block Editor ---
-function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
+function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, useThemeColor, onSaveToHistory }){
   const ref = useRef();
   const [editingHeader, setEditingHeader] = useState(null);
   const [resizing, setResizing] = useState(null);
@@ -911,7 +1078,32 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
     const cols = [...(block.table.cols||[])];
     cols.push('');
     const rows = block.table.rows.map(r=>[...r,'']);
-    onChange({ table: {...block.table, cols, rows }});
+
+    // Redistribute column widths to accommodate new column
+    const currentColWidths = block.table.colWidths || {};
+    const newColWidths = {};
+    const totalCols = cols.length;
+
+    // If we have existing widths, scale them down proportionally
+    if (Object.keys(currentColWidths).length > 0) {
+      const scaleFactor = (totalCols - 1) / totalCols;
+      for (let i = 0; i < totalCols - 1; i++) {
+        if (currentColWidths[i]) {
+          newColWidths[i] = Math.floor(currentColWidths[i] * scaleFactor);
+        }
+      }
+      // Set width for new column based on average of existing columns
+      const avgWidth = Object.values(newColWidths).reduce((sum, w) => sum + w, 0) / (totalCols - 1);
+      newColWidths[totalCols - 1] = Math.floor(avgWidth);
+    } else {
+      // No existing widths, set equal percentage widths for all columns
+      const equalWidthPercent = Math.floor(100 / totalCols);
+      for (let i = 0; i < totalCols; i++) {
+        newColWidths[i] = equalWidthPercent;
+      }
+    }
+
+    onChange({ table: {...block.table, cols, rows, colWidths: newColWidths }});
   }
   function updateCell(r,c,val){
     const rows = block.table.rows.map((row,ri)=> ri===r ? row.map((cell,ci)=> ci===c? val : cell) : row );
@@ -919,7 +1111,26 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   }
   function updateHeader(i,val){ const cols = block.table.cols.map((h,hi)=> hi===i? val:h); onChange({ table: {...block.table, cols }});}
   function removeRow(i){ const rows = block.table.rows.filter((_,ri)=>ri!==i); onChange({ table: {...block.table, rows }});}
-  function removeCol(i){ const cols = block.table.cols.filter((_,ci)=>ci!==i); const rows = block.table.rows.map(r=>r.filter((_,ci)=>ci!==i)); onChange({ table: {...block.table, cols, rows }});}
+  function removeCol(i){
+    const cols = block.table.cols.filter((_,ci)=>ci!==i);
+    const rows = block.table.rows.map(r=>r.filter((_,ci)=>ci!==i));
+
+    // Update column widths by removing the deleted column and redistributing
+    const currentColWidths = block.table.colWidths || {};
+    const newColWidths = {};
+    let colIndex = 0;
+
+    for (let originalIndex = 0; originalIndex < block.table.cols.length; originalIndex++) {
+      if (originalIndex !== i) {
+        if (currentColWidths[originalIndex]) {
+          newColWidths[colIndex] = currentColWidths[originalIndex];
+        }
+        colIndex++;
+      }
+    }
+
+    onChange({ table: {...block.table, cols, rows, colWidths: newColWidths }});
+  }
   function toggleBold(r,c){
     const key = `${r}-${c}`;
     const newBold = new Set(boldCells);
@@ -937,6 +1148,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
   // Timeline helpers
   function updateEvent(idx, key, val){
+    console.log('updateEvent called:', { idx, key, val });
     const events = [...block.events]; events[idx][key] = val; onChange({ events });
   }
 
@@ -1031,12 +1243,73 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
   return (
     <div style={{marginBottom:12, position:'relative'}}>
       <div style={{position:'absolute', right:6, top:6, display:'flex', gap:6, zIndex: 10}}>
-        <button onClick={e=>{e.stopPropagation(); onRemove();}} title="Delete Block" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🗑️</button>
+        <div style={{
+          display:'flex',
+          flexDirection:'column',
+          alignItems:'center',
+          gap:'4px',
+          position:'relative'
+        }}>
+          {/* Whitish backdrop glow */}
+          <div style={{
+            position:'absolute',
+            top:'-10px',
+            left:'-10px',
+            right:'-10px',
+            bottom:'-8px',
+            background:'radial-gradient(ellipse 120% 150%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 25%, rgba(255,255,255,0.85) 45%, rgba(255,255,255,0.65) 65%, rgba(255,255,255,0.3) 80%, transparent 100%)',
+            borderRadius:'50%',
+            zIndex:'999',
+            pointerEvents:'none',
+            filter:'blur(3px)'
+          }}></div>
+
+          <button
+            onClick={e=>{e.stopPropagation(); onRemove();}}
+            title="Delete Table"
+            style={{
+              width:'40px',
+              height:'40px',
+              border:'2px solid #ff4444',
+              borderRadius:'50%',
+              background:'linear-gradient(145deg, #ff5555, #cc3333)',
+              color:'white',
+              cursor:'pointer',
+              fontSize:'16px',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              boxShadow:'0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(255,68,68,0.4), inset 0 1px 3px rgba(255,255,255,0.3)',
+              transition:'all 0.2s ease',
+              position:'relative',
+              zIndex:'1000'
+            }}
+            onMouseEnter={e => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 12px 24px rgba(0,0,0,0.3), 0 6px 12px rgba(255,68,68,0.5), inset 0 1px 3px rgba(255,255,255,0.3)';
+            }}
+            onMouseLeave={e => {
+              e.target.style.transform = 'translateY(0px)';
+              e.target.style.boxShadow = '0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(255,68,68,0.4), inset 0 1px 3px rgba(255,255,255,0.3)';
+            }}
+          >
+            🗑️
+          </button>
+          <span style={{
+            fontSize:'10px',
+            color:'#ff4444',
+            fontFamily:'Helvetica',
+            fontWeight:'500',
+            position:'relative',
+            zIndex:'1000',
+            textShadow:'0 1px 2px rgba(255,255,255,0.8)'
+          }}>Remove</span>
+        </div>
       </div>
 
-      {block.type==='h1' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'38px'}} dir="ltr"></div>}
-      {block.type==='h2' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'24px'}} dir="ltr"></div>}
-      {block.type==='h3' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px'}} dir="ltr"></div>}
+      {block.type==='h1' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'38px'}} dir="ltr"></div>}
+      {block.type==='h2' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'24px'}} dir="ltr"></div>}
+      {block.type==='h3' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px'}} dir="ltr"></div>}
       {block.type==='p' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px', whiteSpace:'pre-wrap'}} dir="ltr"></div>}
       {block.type==='fact' && <div className={selected ? "fact fact-editing" : "fact"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
       {block.type==='card' && <div className="card" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
@@ -1083,9 +1356,22 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
               <input className="big"
                 value={s.value}
                 onChange={e=>{
+                  console.log('stat value onChange:', { idx, value: e.target.value });
                   const stats = [...(block.stats||[])];
                   stats[idx].value = e.target.value;
                   onChange({ stats });
+                }}
+                onInput={e=>{
+                  const stats = [...(block.stats||[])];
+                  stats[idx].value = e.target.value;
+                  onChange({ stats });
+                }}
+                onFocus={() => {
+                  // Save to history when starting to edit a stat box
+                  if (window.statBoxFocusTimer) clearTimeout(window.statBoxFocusTimer);
+                  window.statBoxFocusTimer = setTimeout(() => {
+                    onSaveToHistory();
+                  }, 100);
                 }}
                 style={{
                   direction:'ltr',
@@ -1104,9 +1390,22 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
               <input className="sub"
                 value={s.title}
                 onChange={e=>{
+                  console.log('stat title onChange:', { idx, title: e.target.value });
                   const stats = [...(block.stats||[])];
                   stats[idx].title = e.target.value;
                   onChange({ stats });
+                }}
+                onInput={e=>{
+                  const stats = [...(block.stats||[])];
+                  stats[idx].title = e.target.value;
+                  onChange({ stats });
+                }}
+                onFocus={() => {
+                  // Save to history when starting to edit a stat box
+                  if (window.statBoxFocusTimer) clearTimeout(window.statBoxFocusTimer);
+                  window.statBoxFocusTimer = setTimeout(() => {
+                    onSaveToHistory();
+                  }, 100);
                 }}
                 style={{
                   direction:'ltr',
@@ -1129,54 +1428,66 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
       {block.type==='table' && (
         <div>
-          <div className="table-toolbar" style={{display:'flex', gap:8, marginBottom:8, alignItems:'center'}}>
-            <button onClick={e=>{e.stopPropagation(); addRow();}} title="Add Row" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
-            <button onClick={e=>{e.stopPropagation(); addCol();}} title="Add Column" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
+          <div className="table-toolbar" style={{display:'flex', gap:12, marginBottom:8, alignItems:'flex-end'}}>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={e=>{e.stopPropagation(); addRow();}} title="Add Row" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Add Row</span>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+              <button onClick={e=>{e.stopPropagation(); addCol();}} title="Add Column" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
+              <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Add Col</span>
+            </div>
 
             {selectedCell && (
               <>
-                <button
-                  onClick={e=>{e.stopPropagation(); removeRow(selectedCell.r);}}
-                  title={`Delete Row ${selectedCell.r + 1}`}
-                  style={{
-                    width:'32px',
-                    height:'32px',
-                    border:'2px solid #ff4444',
-                    borderRadius:'50%',
-                    background:'#ff4444',
-                    color:'white',
-                    cursor:'pointer',
-                    fontSize:'14px',
-                    display:'flex',
-                    alignItems:'center',
-                    justifyContent:'center',
-                    boxShadow:'0 2px 4px rgba(255,68,68,0.3)',
-                    fontWeight:'bold'
-                  }}
-                >
-                  🗑️
-                </button>
-                <button
-                  onClick={e=>{e.stopPropagation(); removeCol(selectedCell.c);}}
-                  title={`Delete Column ${selectedCell.c + 1}`}
-                  style={{
-                    width:'32px',
-                    height:'32px',
-                    border:'2px solid #ff4444',
-                    borderRadius:'50%',
-                    background:'#ff4444',
-                    color:'white',
-                    cursor:'pointer',
-                    fontSize:'14px',
-                    display:'flex',
-                    alignItems:'center',
-                    justifyContent:'center',
-                    boxShadow:'0 2px 4px rgba(255,68,68,0.3)',
-                    fontWeight:'bold'
-                  }}
-                >
-                  🗑️
-                </button>
+                <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+                  <button
+                    onClick={e=>{e.stopPropagation(); removeRow(selectedCell.r);}}
+                    title={`Delete Row ${selectedCell.r + 1}`}
+                    style={{
+                      width:'40px',
+                      height:'40px',
+                      border:'2px solid #ff4444',
+                      borderRadius:'50%',
+                      background:'#ff4444',
+                      color:'white',
+                      cursor:'pointer',
+                      fontSize:'16px',
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      boxShadow:'0 2px 4px rgba(255,68,68,0.3)',
+                      fontWeight:'bold'
+                    }}
+                  >
+                    🗑️
+                  </button>
+                  <span style={{fontSize:'10px', color:'#ff4444', fontFamily:'Helvetica', fontWeight:'500'}}>Del Row</span>
+                </div>
+                <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+                  <button
+                    onClick={e=>{e.stopPropagation(); removeCol(selectedCell.c);}}
+                    title={`Delete Column ${selectedCell.c + 1}`}
+                    style={{
+                      width:'40px',
+                      height:'40px',
+                      border:'2px solid #ff4444',
+                      borderRadius:'50%',
+                      background:'#ff4444',
+                      color:'white',
+                      cursor:'pointer',
+                      fontSize:'16px',
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      boxShadow:'0 2px 4px rgba(255,68,68,0.3)',
+                      fontWeight:'bold'
+                    }}
+                  >
+                    🗑️
+                  </button>
+                  <span style={{fontSize:'10px', color:'#ff4444', fontFamily:'Helvetica', fontWeight:'500'}}>Del Col</span>
+                </div>
               </>
             )}
           </div>
@@ -1186,6 +1497,8 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
               borderCollapse: 'separate',
               borderSpacing: 0,
               width: '100%',
+              maxWidth: '100%',
+              tableLayout: 'fixed',
               margin: '10px 0 20px 0',
               border: '1.5px solid #000000',
               borderRadius: '8px',
@@ -1202,7 +1515,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
               }}>
                 {(block.table.cols||[]).map((h,hi)=>(
                   <th key={hi} style={{
-                    width: colWidths[hi] || 'auto',
+                    width: colWidths[hi] ? `${colWidths[hi]}%` : 'auto',
                     position: 'relative',
                     padding: '8px 10px',
                     textAlign: 'left',
@@ -1314,7 +1627,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                 >
                   {r.map((c,ci)=>(
                     <td key={ci} style={{
-                      width: colWidths[ci] || 'auto',
+                      width: colWidths[ci] ? `${colWidths[ci]}%` : 'auto',
                       padding: '8px 10px',
                       borderTop: '1.5px solid rgb(0, 0, 0)',
                       borderRight: ci < r.length - 1 ? '1.5px solid #000' : 'none',
@@ -1428,6 +1741,13 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   className="year"
                   value={ev.year}
                   onChange={(e) => updateEvent(idx, 'year', e.target.value)}
+                  onFocus={() => {
+                    // Save to history when starting to edit a timeline field
+                    if (window.timelineFocusTimer) clearTimeout(window.timelineFocusTimer);
+                    window.timelineFocusTimer = setTimeout(() => {
+                      onSaveToHistory();
+                    }, 100);
+                  }}
                   style={{
                     direction:'ltr',
                     textAlign:'center',
@@ -1450,6 +1770,13 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   className="desc"
                   value={ev.desc}
                   onChange={(e) => updateEvent(idx, 'desc', e.target.value)}
+                  onFocus={() => {
+                    // Save to history when starting to edit a timeline field
+                    if (window.timelineFocusTimer) clearTimeout(window.timelineFocusTimer);
+                    window.timelineFocusTimer = setTimeout(() => {
+                      onSaveToHistory();
+                    }, 100);
+                  }}
                   style={{
                     direction:'ltr',
                     textAlign:'left',
