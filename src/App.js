@@ -1153,7 +1153,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                             el.style.setProperty('unicode-bidi', 'normal', 'important');
                             el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
                             el.setAttribute('dir', 'ltr');
-                            // Set initial content only if element is empty
+                            // Set initial content only if element is empty (same as table cells)
                             if (el.innerHTML !== (h || '')) {
                               el.innerHTML = h || '';
                             }
@@ -1170,8 +1170,8 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           element.style.setProperty('writing-mode', 'horizontal-tb', 'important');
                           element.setAttribute('dir', 'ltr');
 
-                          const text = element.textContent || '';
-                          updateHeader(hi, text);
+                          const html = element.innerHTML || '';
+                          updateHeader(hi, html);
                         }}
                         onBlur={() => setEditingHeader(null)}
                         onKeyDown={e => e.key === 'Enter' && setEditingHeader(null)}
@@ -1190,7 +1190,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           unicodeBidi: 'normal !important',
                           writingMode: 'horizontal-tb !important'
                         }}
-                      />
+                      ></div>
                     ) : (
                       <span
                         onClick={e => {e.stopPropagation(); setEditingHeader(hi);}}
