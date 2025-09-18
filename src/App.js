@@ -426,9 +426,30 @@ ${body}
             });
             newBlocks.push({ id, type: 'stat-grid', stats });
           } else if (el.tagName === 'TABLE') {
-            const headers = Array.from(el.querySelectorAll('thead th')).map(th => th.textContent || '');
+            const headerElements = Array.from(el.querySelectorAll('thead th'));
+            const headers = headerElements.map(th => th.textContent || '');
+
+            // Extract column widths from th elements
+            const colWidths = {};
+            headerElements.forEach((th, index) => {
+              const style = th.getAttribute('style') || '';
+              const widthMatch = style.match(/width:\s*(\d+)px/);
+              if (widthMatch) {
+                colWidths[index] = parseInt(widthMatch[1]);
+              }
+            });
+
             const rows = Array.from(el.querySelectorAll('tbody tr')).map(tr =>
-              Array.from(tr.querySelectorAll('td')).map(td => {
+              Array.from(tr.querySelectorAll('td')).map((td, index) => {
+                // Also check td elements for width if th didn't have it
+                if (!colWidths[index]) {
+                  const tdStyle = td.getAttribute('style') || '';
+                  const tdWidthMatch = tdStyle.match(/width:\s*(\d+)px/);
+                  if (tdWidthMatch) {
+                    colWidths[index] = parseInt(tdWidthMatch[1]);
+                  }
+                }
+
                 // Check if cell has CSS bold styling and convert to HTML
                 const cellStyle = td.getAttribute('style') || '';
                 const hasCssBold = cellStyle.includes('font-weight:bold') || cellStyle.includes('font-weight: bold');
@@ -448,7 +469,7 @@ ${body}
               table: {
                 cols: headers,
                 rows: rows,
-                colWidths: {},
+                colWidths: colWidths,
                 boldCells: []
               }
             });
@@ -1108,9 +1129,56 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
 
       {block.type==='table' && (
         <div>
-          <div style={{display:'flex', gap:8, marginBottom:8, alignItems:'center'}}>
+          <div className="table-toolbar" style={{display:'flex', gap:8, marginBottom:8, alignItems:'center'}}>
             <button onClick={e=>{e.stopPropagation(); addRow();}} title="Add Row" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
             <button onClick={e=>{e.stopPropagation(); addCol();}} title="Add Column" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
+
+            {selectedCell && (
+              <>
+                <button
+                  onClick={e=>{e.stopPropagation(); removeRow(selectedCell.r);}}
+                  title={`Delete Row ${selectedCell.r + 1}`}
+                  style={{
+                    width:'32px',
+                    height:'32px',
+                    border:'2px solid #ff4444',
+                    borderRadius:'50%',
+                    background:'#ff4444',
+                    color:'white',
+                    cursor:'pointer',
+                    fontSize:'14px',
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center',
+                    boxShadow:'0 2px 4px rgba(255,68,68,0.3)',
+                    fontWeight:'bold'
+                  }}
+                >
+                  🗑️
+                </button>
+                <button
+                  onClick={e=>{e.stopPropagation(); removeCol(selectedCell.c);}}
+                  title={`Delete Column ${selectedCell.c + 1}`}
+                  style={{
+                    width:'32px',
+                    height:'32px',
+                    border:'2px solid #ff4444',
+                    borderRadius:'50%',
+                    background:'#ff4444',
+                    color:'white',
+                    cursor:'pointer',
+                    fontSize:'14px',
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center',
+                    boxShadow:'0 2px 4px rgba(255,68,68,0.3)',
+                    fontWeight:'bold'
+                  }}
+                >
+                  🗑️
+                </button>
+              </>
+            )}
           </div>
           <table
             className="editing-table"
@@ -1204,7 +1272,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         {h || 'Click to edit'}
                       </span>
                     )}
-                    <button onClick={e=>{e.stopPropagation(); removeCol(hi);}} title="Delete Column" style={{position:'absolute', top:'50%', right:'8px', transform:'translateY(-50%)', width:'16px', height:'16px', border:'1px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'12px', fontWeight:'bold', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.1)'}}>−</button>
                     {hi < (block.table.cols||[]).length - 1 && (
                       <div
                         onMouseDown={e => handleResizeStart(hi, e)}
@@ -1226,23 +1293,29 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                     )}
                   </th>
                 ))}
-                <th style={{
-                  width: '40px',
-                  padding: '4px',
-                  textAlign: 'center',
-                  borderRight: 'none'
-                }}></th>
               </tr>
             </thead>
             <tbody>
               {(block.table.rows||[]).map((r,ri)=>(
                 <tr key={ri} style={{
-                  background: ri % 2 === 0 ? '#ffffff' : '#f6f6f6'
-                }}>
+                  background: ri % 2 === 0 ? '#ffffff' : '#f6f6f6',
+                  position: 'relative'
+                }}
+                onMouseEnter={e => {
+                  if (selected) {
+                    const btn = e.currentTarget.querySelector('.row-delete-btn');
+                    if (btn) btn.style.opacity = '1';
+                  }
+                }}
+                onMouseLeave={e => {
+                  const btn = e.currentTarget.querySelector('.row-delete-btn');
+                  if (btn) btn.style.opacity = '0';
+                }}
+                >
                   {r.map((c,ci)=>(
                     <td key={ci} style={{
                       width: colWidths[ci] || 'auto',
-                      padding: '0px',
+                      padding: '8px 10px',
                       borderTop: '1.5px solid rgb(0, 0, 0)',
                       borderRight: ci < r.length - 1 ? '1.5px solid #000' : 'none',
                       fontFamily: 'Helvetica'
@@ -1278,7 +1351,12 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           updateCell(ri,ci,html);
                         }}
                         onFocus={() => setSelectedCell({r: ri, c: ci})}
-                        onBlur={() => setSelectedCell(null)}
+                        onBlur={(e) => {
+                          // Don't clear selection if clicking on toolbar buttons
+                          if (!e.relatedTarget || !e.relatedTarget.closest('.table-toolbar')) {
+                            setSelectedCell(null);
+                          }
+                        }}
                         onKeyDown={e => {
                           if (e.ctrlKey && e.key === 'b') {
                             e.preventDefault();
@@ -1291,13 +1369,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           background: 'transparent',
                           outline: selectedCell?.r === ri && selectedCell?.c === ci ? `2px solid ${theme}` : 'none',
                           fontSize: '16px',
-                          padding: '8px 10px',
+                          padding: '2px',
                           fontFamily: 'Helvetica',
                           minHeight: '20px',
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                          whiteSpace: 'normal',
-                          lineHeight: '1.6',
+                          lineHeight: '1.4',
                           direction: 'ltr !important',
                           textAlign: 'left !important',
                           unicodeBidi: 'normal !important',
@@ -1306,39 +1381,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                       ></div>
                     </td>
                   ))}
-                  <td style={{
-                    width: '40px',
-                    padding: '4px',
-                    textAlign: 'center',
-                    borderTop: '1.5px solid rgb(0, 0, 0)',
-                    position: 'relative'
-                  }}>
-                    <button
-                      onClick={e=>{e.stopPropagation(); removeRow(ri);}}
-                      title="Delete Row"
-                      style={{
-                        position:'absolute',
-                        top:'50%',
-                        left:'50%',
-                        transform:'translate(-50%, -50%)',
-                        width:'16px',
-                        height:'16px',
-                        border:'1px solid #666',
-                        boxShadow:'0 1px 2px rgba(0,0,0,0.1)',
-                        borderRadius:'50%',
-                        background:'#ff4444',
-                        color:'white',
-                        cursor:'pointer',
-                        fontSize:'12px',
-                        fontWeight:'bold',
-                        display:'flex',
-                        alignItems:'center',
-                        justifyContent:'center'
-                      }}
-                    >
-                      −
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>

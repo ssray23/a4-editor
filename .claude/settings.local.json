@@ -17,7 +17,8 @@
       "WebFetch(domain:stackoverflow.com)",
       "Bash(start http://localhost:3001)",
       "Bash(git commit:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npx kill-port:*)"
     ],
     "deny": [],
     "ask": []
