@@ -6,7 +6,7 @@ function escapeHtml(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'
 
 // Simple fix based on Stack Overflow research - just force dir attribute
 
-function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left !important; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important;" dir="ltr">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal; ${boldCells.includes(`${ri}-${ci}`) ? 'font-weight:bold;' : ''}">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
+function renderBlockHtml(b, theme = '#1f6feb') { if (b.type === "h1") return `<h1>${b.html||" "}</h1>`; if (b.type === "h2") return `<h2>${b.html||" "}</h2>`; if (b.type === "h3") return `<h3>${b.html||" "}</h3>`; if (b.type === "p") return `<p>${b.html||" "}</p>`; if (b.type === "fact") return `<div class="fact">${b.html||" "}</div>`; if (b.type === "card") return `<div class="card">${b.html||" "}</div>`; if (b.type === "stat-grid") { const items = (b.stats||[]).map(s=>`<div class="stat" style="direction:ltr;"><div class="big" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.value)}</div><div class="sub" style="direction:ltr; text-align:center; unicode-bidi:normal;">${escapeHtml(s.title)}</div></div>`).join(''); return `<div class="stat-grid">${items}</div>`; } if (b.type === "table") { const cols = b.table?.cols||[]; const rows = b.table?.rows||[]; const colWidths = b.table?.colWidths||{}; const boldCells = Array.isArray(b.table?.boldCells) ? b.table.boldCells : []; const thead = `<thead><tr style="background:${theme}; color:#fff; line-height:1.4;">${cols.map((c,i)=>`<th style="${colWidths[i] ? `width:${colWidths[i]}px; ` : ''}padding:8px 10px; text-align:left !important; font-weight:700; ${i < cols.length-1 ? 'border-right:1.5px solid #000000;' : ''} font-family:Helvetica; direction:ltr !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important;" dir="ltr">${escapeHtml(c)}</th>`).join('')}</tr></thead>`; const tbody = `<tbody>${rows.map((r,ri)=>`<tr style="background:${ri % 2 === 0 ? '#ffffff' : '#f6f6f6'}">${r.map((c,ci)=>`<td style="${colWidths[ci] ? `width:${colWidths[ci]}px; ` : ''}padding:8px 10px; border-top:1.5px solid rgb(0,0,0); ${ci < r.length-1 ? 'border-right:1.5px solid #000;' : ''} font-family:Helvetica; direction:ltr; text-align:left; unicode-bidi:normal;">${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody>`; return `<table class="rendered-table" style="border-collapse:separate; border-spacing:0; width:100%; margin:10px 0 20px 0; border:1.5px solid #000000; border-radius:8px; overflow:hidden; line-height:1.4; font-family:Helvetica;">${thead}${tbody}</table>`; } if (b.type === "timeline") { const events = (b.events||[]).map(e=>`<div class="timeline-event"><div class="year">${escapeHtml(e.year)}</div><div class="desc">${escapeHtml(e.desc)}</div></div>`).join(''); return `<div class="timeline">${events}</div>`; } if (b.type === "citation") { return `<div class="citation">${b.html||" "}</div>`; } if (b.type === "hr") { return `<hr class="divider" />`; } return `<div>${escapeHtml(b.html||" ")}</div>`; }
 
 function A4Editor() {
   const defaultTheme = "#1f6feb"; // default theme
@@ -1111,30 +1111,6 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
           <div style={{display:'flex', gap:8, marginBottom:8, alignItems:'center'}}>
             <button onClick={e=>{e.stopPropagation(); addRow();}} title="Add Row" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
             <button onClick={e=>{e.stopPropagation(); addCol();}} title="Add Column" style={{width:'32px', height:'32px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'14px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>➕</button>
-            {selectedCell && (
-              <button
-                className="bold-button"
-                onMouseDown={e=>e.preventDefault()} // Prevent blur from happening
-                onClick={e=>{e.stopPropagation(); toggleBold(selectedCell.r, selectedCell.c);}}
-                title="Toggle Bold (Ctrl+B)"
-                style={{
-                  width:'32px',
-                  height:'32px',
-                  border:`2px solid ${boldCells.has(`${selectedCell.r}-${selectedCell.c}`) ? theme : '#ddd'}`,
-                  borderRadius:'50%',
-                  background: boldCells.has(`${selectedCell.r}-${selectedCell.c}`) ? theme : 'white',
-                  color: boldCells.has(`${selectedCell.r}-${selectedCell.c}`) ? 'white' : 'black',
-                  cursor:'pointer',
-                  fontSize:'14px',
-                  fontWeight:'bold',
-                  display:'flex',
-                  alignItems:'center',
-                  justifyContent:'center'
-                }}
-              >
-                B
-              </button>
-            )}
           </div>
           <table
             className="editing-table"
@@ -1228,7 +1204,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         {h || 'Click to edit'}
                       </span>
                     )}
-                    <button onClick={e=>{e.stopPropagation(); removeCol(hi);}} title="Delete Column" style={{position:'absolute', top:'2px', right:'2px', width:'16px', height:'16px', border:'1px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'8px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.1)'}}>×</button>
+                    <button onClick={e=>{e.stopPropagation(); removeCol(hi);}} title="Delete Column" style={{position:'absolute', top:'50%', right:'8px', transform:'translateY(-50%)', width:'16px', height:'16px', border:'1px solid #666', borderRadius:'50%', background:'#ff4444', color:'white', cursor:'pointer', fontSize:'12px', fontWeight:'bold', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.1)'}}>−</button>
                     {hi < (block.table.cols||[]).length - 1 && (
                       <div
                         onMouseDown={e => handleResizeStart(hi, e)}
@@ -1266,7 +1242,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                   {r.map((c,ci)=>(
                     <td key={ci} style={{
                       width: colWidths[ci] || 'auto',
-                      padding: '8px 10px',
+                      padding: '0px',
                       borderTop: '1.5px solid rgb(0, 0, 0)',
                       borderRight: ci < r.length - 1 ? '1.5px solid #000' : 'none',
                       fontFamily: 'Helvetica'
@@ -1302,12 +1278,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           updateCell(ri,ci,html);
                         }}
                         onFocus={() => setSelectedCell({r: ri, c: ci})}
-                        onBlur={(e) => {
-                          // Don't clear selection if clicking on bold button
-                          if (!e.relatedTarget || !e.relatedTarget.closest('.bold-button')) {
-                            setSelectedCell(null);
-                          }
-                        }}
+                        onBlur={() => setSelectedCell(null)}
                         onKeyDown={e => {
                           if (e.ctrlKey && e.key === 'b') {
                             e.preventDefault();
@@ -1320,7 +1291,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                           background: 'transparent',
                           outline: selectedCell?.r === ri && selectedCell?.c === ci ? `2px solid ${theme}` : 'none',
                           fontSize: '16px',
-                          padding: '2px',
+                          padding: '8px 10px',
                           fontFamily: 'Helvetica',
                           minHeight: '20px',
                           wordWrap: 'break-word',
@@ -1346,6 +1317,10 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                       onClick={e=>{e.stopPropagation(); removeRow(ri);}}
                       title="Delete Row"
                       style={{
+                        position:'absolute',
+                        top:'50%',
+                        left:'50%',
+                        transform:'translate(-50%, -50%)',
                         width:'16px',
                         height:'16px',
                         border:'1px solid #666',
@@ -1354,13 +1329,14 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                         background:'#ff4444',
                         color:'white',
                         cursor:'pointer',
-                        fontSize:'8px',
+                        fontSize:'12px',
+                        fontWeight:'bold',
                         display:'flex',
                         alignItems:'center',
                         justifyContent:'center'
                       }}
                     >
-                      ×
+                      −
                     </button>
                   </td>
                 </tr>
@@ -1396,14 +1372,15 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme }){
                       background:'#ff4444',
                       color:'white',
                       cursor:'pointer',
-                      fontSize:'10px',
+                      fontSize:'14px',
+                      fontWeight:'bold',
                       display:'flex',
                       alignItems:'center',
                       justifyContent:'center',
                       boxShadow:'0 1px 3px rgba(0,0,0,0.2)',
                       zIndex:10
                     }}
-                  >×</button>
+                  >−</button>
                 )}
                 <input
                   className="year"
