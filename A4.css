@@ -59,7 +59,7 @@ p {
     border-radius: 12px;
     padding: 18px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-    border: 1px solid #dfe6ea;
+    border: none !important;
 }
 
 table {
@@ -68,8 +68,8 @@ table {
     width: 100%;
     margin: 10px 0 20px 0;
     border: 1.5px solid #000000;
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 8px !important;
+    overflow: hidden !important;
     line-height: 1.4;
 }
 
@@ -84,6 +84,7 @@ thead th {
     text-align: left;
     font-weight: 700;
     border-right: 1.5px solid #000000;
+    border-radius: 4px;
 }
 
 thead th:last-child {
@@ -94,6 +95,7 @@ tbody td {
     padding: 10px 12px;
     border-top: 1.5px solid rgb(0, 0, 0);
     border-right: 1.5px solid #000;
+    border-radius: 4px;
 }
 
 tbody td:last-child {
@@ -149,6 +151,7 @@ code {
     border-left: 6px solid {theme_color};
     padding: 12px 16px;
     margin: 10px 0;
+    border-radius: 0 8px 8px 0;
 }
 
 .fact strong,

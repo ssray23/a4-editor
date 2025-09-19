@@ -641,7 +641,7 @@ ${body}
               </span>
             )}
           </div>
-          <div style={{display:'flex', gap:8, alignItems:'center', justifyContent:'center', flex:1, paddingRight:'200px'}}>
+          <div style={{display:'flex', gap:8, alignItems:'center', justifyContent:'center', flex:1, paddingRight:'200px', flexWrap:'wrap', maxWidth:'calc(100vw - 400px)'}}>
             <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
               <button onClick={() => setShowColorPicker(s => !s)} title="Change Theme Color" style={{width:'40px', height:'40px', border:'2px solid #666', borderRadius:'50%', background:'white', cursor:'pointer', fontSize:'16px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}}>🎨</button>
               <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Colour</span>
@@ -880,6 +880,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
     }
   }, [block.table?.boldCells]);
   const [selectedCell, setSelectedCell] = useState(null);
+  const selectedCellRef = useRef(null);
   const headerEditRef = useRef();
   const cellRefs = useRef({});
 
@@ -1081,28 +1082,55 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
   // --- END: MINIMAL onInput FUNCTION ---
 
   // Table helpers
-  function addRow(){ const rows = [...(block.table.rows||[])]; const cols = block.table.cols||[]; rows.push(cols.map(()=>"")); onChange({ table: {...block.table, rows }});}
+  function addRow(){
+    const rows = [...(block.table.rows||[])];
+    const cols = block.table.cols||[];
+    const newRow = cols.map(()=>"");
+
+    // Insert after the currently selected row, or at the end if no selection
+    const insertIndex = selectedCellRef.current ? selectedCellRef.current.r + 1 : rows.length;
+    rows.splice(insertIndex, 0, newRow);
+
+    onChange({ table: {...block.table, rows }});
+  }
   function addCol(){
     const cols = [...(block.table.cols||[])];
-    cols.push('');
-    const rows = block.table.rows.map(r=>[...r,'']);
+
+    // Insert after the currently selected column, or at the end if no selection
+    const insertIndex = selectedCellRef.current ? selectedCellRef.current.c + 1 : cols.length;
+    cols.splice(insertIndex, 0, '');
+
+    const rows = block.table.rows.map(r => {
+      const newRow = [...r];
+      newRow.splice(insertIndex, 0, '');
+      return newRow;
+    });
 
     // Redistribute column widths to accommodate new column
     const currentColWidths = block.table.colWidths || {};
     const newColWidths = {};
     const totalCols = cols.length;
 
-    // If we have existing widths, scale them down proportionally
+    // If we have existing widths, redistribute them properly
     if (Object.keys(currentColWidths).length > 0) {
       const scaleFactor = (totalCols - 1) / totalCols;
-      for (let i = 0; i < totalCols - 1; i++) {
-        if (currentColWidths[i]) {
-          newColWidths[i] = Math.floor(currentColWidths[i] * scaleFactor);
+
+      // Rebuild column widths with the new column inserted
+      let newIndex = 0;
+      for (let i = 0; i < totalCols; i++) {
+        if (i === insertIndex) {
+          // New column gets average width of existing columns
+          const avgWidth = Object.values(currentColWidths).reduce((sum, w) => sum + w, 0) / Object.keys(currentColWidths).length;
+          newColWidths[i] = Math.floor(avgWidth * scaleFactor);
+        } else {
+          // Existing columns get scaled down
+          const oldIndex = i > insertIndex ? newIndex - 1 : newIndex;
+          if (currentColWidths[oldIndex]) {
+            newColWidths[i] = Math.floor(currentColWidths[oldIndex] * scaleFactor);
+          }
+          newIndex++;
         }
       }
-      // Set width for new column based on average of existing columns
-      const avgWidth = Object.values(newColWidths).reduce((sum, w) => sum + w, 0) / (totalCols - 1);
-      newColWidths[totalCols - 1] = Math.floor(avgWidth);
     } else {
       // No existing widths, set equal percentage widths for all columns
       const equalWidthPercent = Math.floor(100 / totalCols);
@@ -1287,7 +1315,7 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
               display:'flex',
               alignItems:'center',
               justifyContent:'center',
-              boxShadow:'0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(255,68,68,0.4), inset 0 1px 3px rgba(255,255,255,0.3)',
+              boxShadow:'0 6px 20px rgba(0,0,0,0.18)',
               transition:'all 0.2s ease',
               position:'relative',
               zIndex:'1000'
@@ -1315,12 +1343,12 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
         </div>
       </div>
 
-      {block.type==='h1' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'38px'}} dir="ltr"></div>}
-      {block.type==='h2' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'24px'}} dir="ltr"></div>}
-      {block.type==='h3' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px'}} dir="ltr"></div>}
-      {block.type==='p' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'0', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px', whiteSpace:'pre-wrap'}} dir="ltr"></div>}
+      {block.type==='h1' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'38px', fontWeight:'bold', margin:'0 0 20px 0', lineHeight:'1.3', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'4px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'38px', borderRadius:'8px'}} dir="ltr"></div>}
+      {block.type==='h2' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'24px', fontWeight:'bold', margin:'0 0 10px 0', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'4px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'24px', borderRadius:'6px'}} dir="ltr"></div>}
+      {block.type==='h3' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'20px', fontWeight:'bold', margin:'0 0 8px 0', color: useThemeColor ? theme : 'inherit', border:'none', background:'transparent', width:'100%', padding:'4px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px', borderRadius:'6px'}} dir="ltr"></div>}
+      {block.type==='p' && <div contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{fontFamily:'Helvetica', fontSize:'16px', lineHeight:'1.6', margin:'6px 0 12px 0', color: 'inherit', border:'none', background:'transparent', width:'100%', padding:'4px', outline:'none', direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', minHeight:'20px', whiteSpace:'pre-wrap', borderRadius:'6px'}} dir="ltr"></div>}
       {block.type==='fact' && <div className={selected ? "fact fact-editing" : "fact"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{borderLeftColor: theme, direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
-      {block.type==='card' && <div className="card" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
+      {block.type==='card' && <div className={selected ? "card-editing" : "card"} contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal', border:'0px solid transparent !important', borderTop:'0px solid transparent !important', borderRight:'0px solid transparent !important', borderBottom:'0px solid transparent !important', borderLeft:'0px solid transparent !important', borderWidth:'0px !important', borderStyle:'none !important', borderColor:'transparent !important', outline:'none !important', boxSizing:'border-box !important', background: `${theme}1a`, borderRadius: '12px', padding: '18px', boxShadow: '0 6px 18px rgba(0, 0, 0, 0.06)', margin: '10px 0'}} dir="ltr"></div>}
       {block.type==='citation' && <div className="citation" contentEditable ref={ref} onInput={onInput} suppressContentEditableWarning style={{direction:'ltr !important', textAlign:'left !important', unicodeBidi:'normal'}} dir="ltr"></div>}
       {block.type==='hr' && (
         <div
@@ -1671,11 +1699,16 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
                           const html = element.innerHTML || '';
                           updateCell(ri,ci,html);
                         }}
-                        onFocus={() => setSelectedCell({r: ri, c: ci})}
+                        onFocus={() => {
+                          const cellPos = {r: ri, c: ci};
+                          setSelectedCell(cellPos);
+                          selectedCellRef.current = cellPos;
+                        }}
                         onBlur={(e) => {
                           // Don't clear selection if clicking on toolbar buttons
                           if (!e.relatedTarget || !e.relatedTarget.closest('.table-toolbar')) {
                             setSelectedCell(null);
+                            selectedCellRef.current = null;
                           }
                         }}
                         onKeyDown={e => {
@@ -1697,7 +1730,8 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
                           direction: 'ltr !important',
                           textAlign: 'left !important',
                           unicodeBidi: 'normal !important',
-                          writingMode: 'horizontal-tb !important'
+                          writingMode: 'horizontal-tb !important',
+                          borderRadius: '4px'
                         }}
                       ></div>
                     </td>
@@ -1720,41 +1754,23 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
           <div className={selected ? "timeline timeline-editing" : "timeline"}>
             {(block.events||[]).map((ev,idx)=>(
               <div className="timeline-event" key={idx} style={{position:'relative'}}>
-                {selected && (
-                  <button
-                    onClick={e=>{e.stopPropagation(); removeTimelineEvent(idx);}}
-                    title="Delete Event"
-                    style={{
-                      position:'absolute',
-                      right:'-10px',
-                      top:'-10px',
-                      width:'20px',
-                      height:'20px',
-                      border:'1px solid #ff4444',
-                      borderRadius:'50%',
-                      background:'#ff4444',
-                      color:'white',
-                      cursor:'pointer',
-                      fontSize:'14px',
-                      fontWeight:'bold',
-                      display:'flex',
-                      alignItems:'center',
-                      justifyContent:'center',
-                      boxShadow:'0 1px 3px rgba(0,0,0,0.2)',
-                      zIndex:10
-                    }}
-                  >−</button>
-                )}
                 <input
                   className="year"
                   value={ev.year}
                   onChange={(e) => updateEvent(idx, 'year', e.target.value)}
-                  onFocus={() => {
+                  onFocus={(e) => {
                     // Save to history when starting to edit a timeline field
                     if (window.timelineFocusTimer) clearTimeout(window.timelineFocusTimer);
                     window.timelineFocusTimer = setTimeout(() => {
                       onSaveToHistory();
                     }, 100);
+                    // Add red glow effect
+                    e.target.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.4)';
+                    e.target.style.borderRadius = '6px';
+                  }}
+                  onBlur={(e) => {
+                    // Remove red glow effect
+                    e.target.style.boxShadow = 'none';
                   }}
                   style={{
                     direction:'ltr',
@@ -1774,31 +1790,66 @@ function BlockEditor({ block, onChange, onRemove, onSelect, selected, theme, use
                     whiteSpace:'nowrap'
                   }}
                   dir="ltr" />
-                <input
-                  className="desc"
-                  value={ev.desc}
-                  onChange={(e) => updateEvent(idx, 'desc', e.target.value)}
-                  onFocus={() => {
-                    // Save to history when starting to edit a timeline field
-                    if (window.timelineFocusTimer) clearTimeout(window.timelineFocusTimer);
-                    window.timelineFocusTimer = setTimeout(() => {
-                      onSaveToHistory();
-                    }, 100);
-                  }}
-                  style={{
-                    direction:'ltr',
-                    textAlign:'left',
-                    background:'#fff',
-                    border:'1px solid #e0e0e0',
-                    borderRadius:'8px',
-                    padding:'16px',
-                    width:'100%',
-                    fontSize:'14px',
-                    color:'#333',
-                    fontFamily:'Helvetica, Arial, sans-serif',
-                    boxShadow:'0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                  dir="ltr" />
+                <div style={{position:'relative', display:'inline-block', width:'100%'}}>
+                  <input
+                    className="desc"
+                    value={ev.desc}
+                    onChange={(e) => updateEvent(idx, 'desc', e.target.value)}
+                    onFocus={(e) => {
+                      // Save to history when starting to edit a timeline field
+                      if (window.timelineFocusTimer) clearTimeout(window.timelineFocusTimer);
+                      window.timelineFocusTimer = setTimeout(() => {
+                        onSaveToHistory();
+                      }, 100);
+                      // Add red glow effect
+                      e.target.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.4)';
+                      e.target.style.borderRadius = '8px';
+                    }}
+                    onBlur={(e) => {
+                      // Remove red glow effect
+                      e.target.style.boxShadow = 'none';
+                    }}
+                    style={{
+                      direction:'ltr',
+                      textAlign:'left',
+                      background:'#fff',
+                      border:'1px solid #e0e0e0',
+                      borderRadius:'8px',
+                      padding:'16px',
+                      paddingRight:'40px',
+                      width:'100%',
+                      fontSize:'14px',
+                      color:'#333',
+                      fontFamily:'Helvetica, Arial, sans-serif',
+                      boxShadow:'0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                    dir="ltr" />
+                  {selected && (
+                    <button
+                      onClick={e=>{e.stopPropagation(); removeTimelineEvent(idx);}}
+                      title="Delete Event"
+                      style={{
+                        position:'absolute',
+                        right:'8px',
+                        top:'8px',
+                        width:'20px',
+                        height:'20px',
+                        border:'1px solid #ff4444',
+                        borderRadius:'50%',
+                        background:'#ff4444',
+                        color:'white',
+                        cursor:'pointer',
+                        fontSize:'14px',
+                        fontWeight:'bold',
+                        display:'flex',
+                        alignItems:'center',
+                        justifyContent:'center',
+                        boxShadow:'0 1px 3px rgba(0,0,0,0.2)',
+                        zIndex:10
+                      }}
+                    >−</button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -1843,7 +1894,8 @@ h2 { font-size:24px; margin-top:0; margin-bottom:10px; direction:ltr; text-align
 h3 { font-size:20px; margin-top:0; margin-bottom:8px; direction:ltr; text-align:left; ${useThemeColor ? `color:${theme};` : ''} }
 p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-align:left; white-space: pre-wrap; }
 .fact { border-left:6px solid ${theme}; padding:12px 16px; margin:10px 0; }
-.card { background:${theme}1a; border-radius:12px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:1px solid #dfe6ea; margin:10px 0; direction:ltr !important; text-align:left !important; }
+.card { background:${theme}1a; border-radius:12px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:none !important; margin:10px 0; direction:ltr !important; text-align:left !important; }
+.card-editing { background:${theme}1a; border-radius:12px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:none !important; margin:10px 0; direction:ltr !important; text-align:left !important; }
 .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px; direction:ltr !important; }
 .stat { text-align:center !important; padding:12px 10px; border:1.5px solid #000; border-radius:10px; background:${theme}27; direction:ltr !important; unicode-bidi:normal !important; }
 .stat .big { font-size:28px; color:${theme}; font-weight:800; line-height:1.1; direction:ltr !important; text-align:center !important; unicode-bidi:normal !important; writing-mode:horizontal-tb !important; }
@@ -1957,13 +2009,14 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
 .timeline-event { position: relative; margin-bottom: 24px; padding-inline-start: 70px; font-family: Helvetica, Arial, sans-serif; }
 .timeline-event::before { content: ''; position: absolute; inset-inline-start: 42px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: ${theme}; border: 3px solid #fff; box-shadow: 0 0 0 2px ${theme}; }
 .timeline-event .year { position: absolute; inset-inline-start: -10px; top: 50%; transform: translateY(-50%) rotate(-90deg); transform-origin: center; font-size: 14px; font-weight: 600; color: ${theme}; line-height: 1; font-family: Helvetica, Arial, sans-serif; width: 40px; text-align: center; white-space: nowrap; }
-.timeline-event .desc { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 14px; color: #333; line-height: 1.5; font-family: Helvetica, Arial, sans-serif; text-align: start; }
+.timeline-event .desc { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 14px; color: #333; line-height: 1.5; font-family: Helvetica, Arial, sans-serif; text-align: start; max-width: calc(100% - 70px); width: auto; overflow: hidden; word-wrap: break-word; }
 .citation { font-size:14px; font-style:italic; color:#444; margin:8px 0; }
 .divider { border:none; height:4px; background:${useThemeColor ? theme : '#000000'}; margin:20px 0; width:100%; }
 button:hover { opacity: 0.8; transform: translateY(-1px); transition: all 0.2s ease; }
 button:active { transform: translateY(0); }
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
+[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; caret-color: #ff4444 !important; }
+[contenteditable]:focus { box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important; transition: box-shadow 0.2s ease !important; }
 h1[contenteditable], h2[contenteditable], h3[contenteditable], p[contenteditable], div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
 .a4 [contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
 .a4 h1[contenteditable], .a4 h2[contenteditable], .a4 h3[contenteditable], .a4 p[contenteditable], .a4 div[contenteditable] { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; writing-mode: horizontal-tb !important; }
@@ -1975,16 +2028,16 @@ table td, table th { text-align: left !important; }
 
 /* Word-like borderless editing */
 .fact-editing { border-left: 6px solid ${theme}; outline: none !important; }
-.fact-editing:focus { outline: none !important; border: none !important; }
+.fact-editing:focus { outline: none !important; border: none !important; caret-color: #ff4444 !important; border-radius: 8px !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; }
 .fact-editing * { outline: none !important; }
 .stat-grid-editing .stat { border: 1.5px solid #000; background: ${theme}27; }
 .stat-grid-editing .stat .big:hover, .stat-grid-editing .stat .sub:hover { outline: none; border: none; }
-.stat-grid-editing .stat .big:focus, .stat-grid-editing .stat .sub:focus { outline: none !important; border: none !important; }
-.timeline-editing .timeline-event .desc { border-color: ${theme}; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.stat-grid-editing .stat .big:focus, .stat-grid-editing .stat .sub:focus { outline: none !important; border: none !important; caret-color: #ff4444 !important; border-radius: 6px !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; }
+.timeline-editing .timeline-event .desc { border-color: ${theme}; box-shadow: 0 4px 12px rgba(0,0,0,0.12); max-width: calc(100% - 70px); width: auto; overflow: hidden; word-wrap: break-word; }
 .timeline-editing .timeline-event::before { background: ${theme}; box-shadow: 0 0 0 3px ${theme}; }
 .timeline-editing .year:hover, .timeline-editing .desc:hover { outline: none; }
-.timeline-editing .year:focus { outline: none !important; background: rgba(255,255,255,0.9); border-radius: 4px; padding: 2px; }
-.timeline-editing .desc:focus { outline: none !important; border-color: ${theme}; box-shadow: 0 0 0 2px ${theme}40; }
+.timeline-editing .year:focus { outline: none !important; background: rgba(255,255,255,0.9); border-radius: 6px; padding: 2px; caret-color: #ff4444 !important; box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important; }
+.timeline-editing .desc:focus { outline: none !important; border-color: ${theme}; border-radius: 8px !important; box-shadow: 0 0 0 2px ${theme}40, 0 0 8px rgba(255, 68, 68, 0.4) !important; caret-color: #ff4444 !important; }
 .timeline-editing .year, .timeline-editing .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
 .timeline .year, .timeline .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
