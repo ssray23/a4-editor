@@ -547,9 +547,13 @@ ${body}
             const colWidths = {};
             headerElements.forEach((th, index) => {
               const style = th.getAttribute('style') || '';
-              const widthMatch = style.match(/width:\s*(\d+)px/);
-              if (widthMatch) {
-                colWidths[index] = parseInt(widthMatch[1]);
+              // Support both percentage and pixel widths
+              const percentMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+              const pixelMatch = style.match(/width:\s*(\d+)px/);
+              if (percentMatch) {
+                colWidths[index] = parseFloat(percentMatch[1]);
+              } else if (pixelMatch) {
+                colWidths[index] = parseInt(pixelMatch[1]);
               }
             });
 
@@ -558,9 +562,13 @@ ${body}
                 // Also check td elements for width if th didn't have it
                 if (!colWidths[index]) {
                   const tdStyle = td.getAttribute('style') || '';
-                  const tdWidthMatch = tdStyle.match(/width:\s*(\d+)px/);
-                  if (tdWidthMatch) {
-                    colWidths[index] = parseInt(tdWidthMatch[1]);
+                  // Support both percentage and pixel widths
+                  const tdPercentMatch = tdStyle.match(/width:\s*(\d+(?:\.\d+)?)%/);
+                  const tdPixelMatch = tdStyle.match(/width:\s*(\d+)px/);
+                  if (tdPercentMatch) {
+                    colWidths[index] = parseFloat(tdPercentMatch[1]);
+                  } else if (tdPixelMatch) {
+                    colWidths[index] = parseInt(tdPixelMatch[1]);
                   }
                 }
 
@@ -1928,12 +1936,18 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
   color: white !important;
   font-weight: bold !important;
   padding: 0 !important;
+  margin: 0 !important;
   font-size: inherit !important;
   outline: none !important;
   font-family: Helvetica !important;
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: normal !important;
+  line-height: 1.4 !important;
+  min-height: auto !important;
+  height: auto !important;
+  display: block !important;
+  writing-mode: horizontal-tb !important;
 }
 .bullet-list { padding-left:24px; margin:10px 0; direction:ltr !important; text-align:left !important; unicode-bidi:normal !important; font-family:Helvetica; }
 .bullet-list li { margin-bottom:6px; direction:ltr !important; text-align:left !important; unicode-bidi:normal !important; line-height:1.6; }
