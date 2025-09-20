@@ -18,7 +18,9 @@
       "Bash(start http://localhost:3001)",
       "Bash(git commit:*)",
       "Bash(sed:*)",
-      "Bash(npx kill-port:*)"
+      "Bash(npx kill-port:*)",
+      "Bash(set PORT=3002)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
