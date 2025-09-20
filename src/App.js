@@ -893,6 +893,7 @@ ${body}
 }
 
 // --- Block Editor (optimized with React.memo) ---
+// --- Block Editor (optimized with React.memo) ---
 const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSelect, selected, globalEditMode, theme, useThemeColor, onSaveToHistory }){
   const ref = useRef();
   const [editingHeader, setEditingHeader] = useState(null);
@@ -1870,23 +1871,17 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
                   }}
                   dir="ltr" />
                 <div style={{position:'relative', display:'inline-block', width:'100%'}}>
+                  {/* START: MODIFIED CODE */}
                   <input
                     className="desc"
                     value={ev.desc}
                     onChange={(e) => updateEvent(idx, 'desc', e.target.value)}
-                    onFocus={(e) => {
+                    onFocus={() => {
                       // Save to history when starting to edit a timeline field
                       if (window.timelineFocusTimer) clearTimeout(window.timelineFocusTimer);
                       window.timelineFocusTimer = setTimeout(() => {
                         onSaveToHistory();
                       }, 100);
-                      // Add red glow effect
-                      e.target.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.4)';
-                      e.target.style.borderRadius = '8px';
-                    }}
-                    onBlur={(e) => {
-                      // Remove red glow effect
-                      e.target.style.boxShadow = 'none';
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Escape') {
@@ -1913,6 +1908,7 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
                       boxShadow:'0 2px 4px rgba(0,0,0,0.1)'
                     }}
                     dir="ltr" />
+                  {/* END: MODIFIED CODE */}
                   {globalEditMode && (
                     <button
                       onClick={e=>{e.stopPropagation(); removeTimelineEvent(idx);}}
@@ -1950,6 +1946,7 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
   );
 });
 
+// --- Full stylesheet including timeline & citation ---
 // --- Full stylesheet including timeline & citation ---
 // --- Full stylesheet including timeline & citation ---
 function getStyle(theme, useThemeColor = false){
@@ -2173,7 +2170,15 @@ button:active { transform: translateZ(0) scale(0.95); }
 .timeline-editing .timeline-event::before { background: ${theme}; box-shadow: 0 0 0 3px ${theme}; }
 .timeline-editing .year:hover, .timeline-editing .desc:hover { outline: none; }
 .timeline-editing .year:focus { outline: none !important; background: rgba(255,255,255,0.9); border-radius: 6px; padding: 2px; caret-color: #ff4444 !important; box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important; }
-.timeline-editing .desc:focus { outline: none !important; border-color: ${theme}; border-radius: 8px !important; box-shadow: 0 0 0 2px ${theme}40, 0 0 8px rgba(255, 68, 68, 0.4) !important; caret-color: #ff4444 !important; }
+/* START: MODIFIED CODE */
+.timeline-editing .desc:focus {
+  outline: none !important;
+  border-color: ${theme};
+  border-radius: 8px !important;
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important;
+  caret-color: #ff4444 !important;
+}
+/* END: MODIFIED CODE */
 .timeline-editing .year, .timeline-editing .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
 .timeline .year, .timeline .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
