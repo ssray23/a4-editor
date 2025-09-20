@@ -1434,12 +1434,25 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
                   stats[idx].value = e.target.value;
                   onChange({ stats });
                 }}
-                onFocus={() => {
+                onFocus={(e) => {
                   // Save to history when starting to edit a stat box
                   if (window.statBoxFocusTimer) clearTimeout(window.statBoxFocusTimer);
                   window.statBoxFocusTimer = setTimeout(() => {
                     onSaveToHistory();
                   }, 100);
+                  // Add glow effect to parent stat div
+                  const statDiv = e.target.closest('.stat');
+                  if (statDiv) {
+                    statDiv.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.4)';
+                    statDiv.style.borderRadius = '6px';
+                  }
+                }}
+                onBlur={(e) => {
+                  // Remove glow effect from parent stat div
+                  const statDiv = e.target.closest('.stat');
+                  if (statDiv) {
+                    statDiv.style.boxShadow = 'none';
+                  }
                 }}
                 style={{
                   direction:'ltr',
@@ -1468,12 +1481,25 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
                   stats[idx].title = e.target.value;
                   onChange({ stats });
                 }}
-                onFocus={() => {
+                onFocus={(e) => {
                   // Save to history when starting to edit a stat box
                   if (window.statBoxFocusTimer) clearTimeout(window.statBoxFocusTimer);
                   window.statBoxFocusTimer = setTimeout(() => {
                     onSaveToHistory();
                   }, 100);
+                  // Add glow effect to parent stat div
+                  const statDiv = e.target.closest('.stat');
+                  if (statDiv) {
+                    statDiv.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.4)';
+                    statDiv.style.borderRadius = '6px';
+                  }
+                }}
+                onBlur={(e) => {
+                  // Remove glow effect from parent stat div
+                  const statDiv = e.target.closest('.stat');
+                  if (statDiv) {
+                    statDiv.style.boxShadow = 'none';
+                  }
                 }}
                 style={{
                   direction:'ltr',
@@ -1508,53 +1534,55 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
 
             {selectedCell && (
               <>
-                <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
-                  <button
-                    onClick={e=>{e.stopPropagation(); removeRow(selectedCell.r);}}
-                    title={`Delete Row ${selectedCell.r + 1}`}
-                    style={{
-                      width:'24px',
-                      height:'24px',
-                      border:'1px solid #ff4444',
-                      borderRadius:'50%',
-                      background:'rgba(255, 68, 68, 0.8)',
-                      color:'white',
-                      cursor:'pointer',
-                      fontSize:'12px',
-                      display:'flex',
-                      alignItems:'center',
-                      justifyContent:'center',
-                      boxShadow:'0 2px 6px rgba(0,0,0,0.1)',
-                      fontWeight:'bold',
-                      opacity:'0.7'
-                    }}
-                  >
-                    🗑️
-                  </button>
-                </div>
+                {selectedCell.r >= 0 && (
+                  <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
+                    <button
+                      onClick={e=>{e.stopPropagation(); removeRow(selectedCell.r);}}
+                      title={`Delete Row ${selectedCell.r + 1}`}
+                      style={{
+                        width:'40px',
+                        height:'40px',
+                        border:'2px solid #ff4444',
+                        borderRadius:'50%',
+                        background:'rgba(255, 68, 68, 0.8)',
+                        color:'white',
+                        cursor:'pointer',
+                        fontSize:'16px',
+                        display:'flex',
+                        alignItems:'center',
+                        justifyContent:'center',
+                        boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                        fontWeight:'bold'
+                      }}
+                    >
+                      🗑️
+                    </button>
+                    <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Del Row</span>
+                  </div>
+                )}
                 <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
                   <button
                     onClick={e=>{e.stopPropagation(); removeCol(selectedCell.c);}}
                     title={`Delete Column ${selectedCell.c + 1}`}
                     style={{
-                      width:'24px',
-                      height:'24px',
-                      border:'1px solid #ff4444',
+                      width:'40px',
+                      height:'40px',
+                      border:'2px solid #ff4444',
                       borderRadius:'50%',
                       background:'rgba(255, 68, 68, 0.8)',
                       color:'white',
                       cursor:'pointer',
-                      fontSize:'12px',
+                      fontSize:'16px',
                       display:'flex',
                       alignItems:'center',
                       justifyContent:'center',
-                      boxShadow:'0 2px 6px rgba(0,0,0,0.1)',
-                      fontWeight:'bold',
-                      opacity:'0.7'
+                      boxShadow:'0 2px 4px rgba(0,0,0,0.1)',
+                      fontWeight:'bold'
                     }}
                   >
                     🗑️
                   </button>
+                  <span style={{fontSize:'10px', color:'#666', fontFamily:'Helvetica', fontWeight:'500'}}>Del Col</span>
                 </div>
               </>
             )}
@@ -1663,7 +1691,28 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
                       ></div>
                     ) : (
                       <span
-                        onClick={e => {e.stopPropagation(); setEditingHeader(hi);}}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setEditingHeader(hi);
+                          // Set selected cell to column only (row -1 indicates header)
+                          const cellPos = {r: -1, c: hi};
+                          setSelectedCell(cellPos);
+                          selectedCellRef.current = cellPos;
+                          // Ensure the table block is selected too
+                          onSelect();
+                          // Clear all focused cells first
+                          const table = e.target.closest('table');
+                          if (table) {
+                            table.querySelectorAll('.cell-focused').forEach(cell => {
+                              cell.classList.remove('cell-focused');
+                            });
+                          }
+                          // Add glow to parent header cell
+                          const parentCell = e.target.closest('th');
+                          if (parentCell) {
+                            parentCell.classList.add('cell-focused');
+                          }
+                        }}
                         style={{
                           fontWeight: 'bold',
                           cursor: 'pointer',
@@ -2108,8 +2157,8 @@ p { font-size:16px; line-height:1.6; margin:6px 0 12px; direction:ltr; text-alig
 }
 .a4 table.editing-table thead th.cell-focused {
   box-shadow:
-    inset 0 0 8px rgba(255, 68, 68, 0.3),
-    0 0 4px rgba(255, 68, 68, 0.4) !important;
+    inset 0 0 12px rgba(255, 68, 68, 0.6),
+    0 0 8px rgba(255, 68, 68, 0.8) !important;
   transition: box-shadow 0.2s ease !important;
   position: relative !important;
   z-index: 10 !important;
