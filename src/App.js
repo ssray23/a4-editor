@@ -370,7 +370,7 @@ function A4Editor() {
     if (type === "card") base.html = "<strong>This is a bolded header</strong><br><br>This is some regular text that follows the header. You can select any text and use the bold button or Ctrl+B to format it. This card demonstrates how you can mix bold and regular text within the same element.";
     if (type === "timeline") base.events = [
       { year: "2025", desc: "Event 1 description" },
-      { year: "2023", desc: "Event 2 description" },
+      { year: "2024", desc: "Event 2 description" },
       { year: "2023", desc: "Event 3 description" },
     ];
     if (type === "citation") base.html = "Author. Title. Publisher. Year.";
