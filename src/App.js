@@ -1949,6 +1949,8 @@ const BlockEditor = memo(function BlockEditor({ block, onChange, onRemove, onSel
 // --- Full stylesheet including timeline & citation ---
 // --- Full stylesheet including timeline & citation ---
 // --- Full stylesheet including timeline & citation ---
+// --- Full stylesheet including timeline & citation ---
+// --- Full stylesheet including timeline & citation ---
 function getStyle(theme, useThemeColor = false){
   return `
 /* NUCLEAR RTL OVERRIDE - DO NOT REMOVE */
@@ -2164,13 +2166,16 @@ button:active { transform: translateZ(0) scale(0.95); }
 .citation-editing, .citation-editing:focus, .citation-editing:focus-visible { outline: none !important; border: none !important; }
 .citation-editing *:focus, .citation-editing *:focus-visible { outline: none !important; border: none !important; }
 .stat-grid-editing .stat { border: 1.5px solid #000; background: ${theme}27; }
-.stat-grid-editing .stat .big:hover, .stat-grid-editing .stat .sub:hover { outline: none; border: none; }
-.stat-grid-editing .stat .big:focus, .stat-grid-editing .stat .sub:focus { outline: none !important; border: none !important; caret-color: #ff4444 !important; border-radius: 6px !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; }
+/* START: MODIFIED CODE */
+.stat-grid-editing .stat:focus-within {
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important;
+  transition: box-shadow 0.2s ease !important;
+}
+/* END: MODIFIED CODE */
 .timeline-editing .timeline-event .desc { border-color: ${theme}; box-shadow: 0 4px 12px rgba(0,0,0,0.12); max-width: calc(100% - 70px); width: auto; overflow: hidden; word-wrap: break-word; }
 .timeline-editing .timeline-event::before { background: ${theme}; box-shadow: 0 0 0 3px ${theme}; }
 .timeline-editing .year:hover, .timeline-editing .desc:hover { outline: none; }
 .timeline-editing .year:focus { outline: none !important; background: rgba(255,255,255,0.9); border-radius: 6px; padding: 2px; caret-color: #ff4444 !important; box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important; }
-/* START: MODIFIED CODE */
 .timeline-editing .desc:focus {
   outline: none !important;
   border-color: ${theme};
@@ -2178,7 +2183,6 @@ button:active { transform: translateZ(0) scale(0.95); }
   box-shadow: 0 0 8px rgba(255, 68, 68, 0.4) !important;
   caret-color: #ff4444 !important;
 }
-/* END: MODIFIED CODE */
 .timeline-editing .year, .timeline-editing .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }
 .timeline .year, .timeline .desc { direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }\n\n/* Rendered table styling to match A4.css */\n.rendered-table tbody td { padding: 8px 10px !important; min-height: 20px; }\n.rendered-table thead th { padding: 8px 10px !important; }
 `;
